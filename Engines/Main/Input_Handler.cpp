@@ -74,11 +74,17 @@ void Input_Handler::setupKeyInput(std::string key_name, int GLFW_key) {
 
 
 bool Input_Handler::getKeyState(std::string key_name, input_states::states state) {
-	return (*states_by_keyname.at(key_name) & state) == state;
-	// if the key's state contains the requested state, bitwise '&' equals the requested state
+	if (states_by_keyname.count(key_name)) {
+		return (*states_by_keyname.at(key_name) & state) == state;
+		// if the key's state contains the requested state, bitwise '&' equals the requested state
+	}
+	else { return false; }
 }
 bool Input_Handler::getKeyState(int GLFW_KEY_value, input_states::states state) {
-	return (states_by_GLFWkey.at(GLFW_KEY_value) & state) == state;
+	if (states_by_GLFWkey.count(GLFW_KEY_value)) {
+		return (states_by_GLFWkey.at(GLFW_KEY_value) & state) == state;
+	}
+	else { return false; }
 }
 
 
@@ -102,9 +108,15 @@ void Input_Handler::key_callback(GLFWwindow* window, int key, int scancode, int 
 bool Input_Handler::getControllerButtonState(int controllerIndex, controller_buttons::buttons button, input_states::states state) {
 	return (controller_button_states[controllerIndex][button] & state) == state;
 }
+bool Input_Handler::getControllerButtonState(int controllerIndex, int button, input_states::states state) {
+	return (controller_button_states[controllerIndex][button] & state) == state;
+}
 
 
 float Input_Handler::getControllerAxisValue(int controllerIndex, controlller_axes::axes axis) {
+	return controller_axes_values[controllerIndex][axis];
+}
+float Input_Handler::getControllerAxisValue(int controllerIndex, int axis) {
 	return controller_axes_values[controllerIndex][axis];
 }
 

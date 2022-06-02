@@ -18,9 +18,9 @@ namespace input_states {
 
 namespace controller_buttons {
 	enum buttons {
-		A = GLFW_GAMEPAD_BUTTON_A, B = GLFW_GAMEPAD_BUTTON_B, 
-		X = GLFW_GAMEPAD_BUTTON_X, Y = GLFW_GAMEPAD_BUTTON_Y,
-		SWITCH_A = B, SWITCH_B = A, SWITCH_X = Y, SWITCH_Y = X,
+		XBOX_A = GLFW_GAMEPAD_BUTTON_A, XBOX_B = GLFW_GAMEPAD_BUTTON_B, 
+		XBOX_X = GLFW_GAMEPAD_BUTTON_X, XBOX_Y = GLFW_GAMEPAD_BUTTON_Y,
+		SWITCH_A = XBOX_B, SWITCH_B = XBOX_A, SWITCH_X = XBOX_Y, SWITCH_Y = XBOX_X,
 		CROSS = GLFW_GAMEPAD_BUTTON_CROSS, CIRCLE = GLFW_GAMEPAD_BUTTON_CIRCLE,
 		SQUARE = GLFW_GAMEPAD_BUTTON_SQUARE, TRIANGLE = GLFW_GAMEPAD_BUTTON_TRIANGLE,
 		L1 = GLFW_GAMEPAD_BUTTON_LEFT_BUMPER, R1 = GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER,
@@ -79,7 +79,8 @@ public:
 	void setupKeyInput(std::string, int);
 
 	/* returns true if the tested state is contained in the key's input_states bitmask
-	ex.: tested state - NOT_PRESSED, actual state - JUST_RELEASED, returns true
+	ex.: tested state - NOT_PRESSED, actual state - JUST_RELEASED, returns true,
+	keys that have not been set up return false,
 	getKeyState(string key_name, input_states::states state)
 	getKeyState(int GLFW_KEY_value, input_states::states state) */
 	bool getKeyState(std::string, input_states::states);

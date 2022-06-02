@@ -1,4 +1,4 @@
-#define TEST_INPUTHANDLER
+//#define TEST_INPUTHANDLER
 #ifdef TEST_INPUTHANDLER
 
 #include "Input_Handler.h"

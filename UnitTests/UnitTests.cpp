@@ -4,6 +4,8 @@
 #include "../Attribute/Attribute.h"
 #include "../Attribute/Attribute.cpp"
 
+#include <iomanip>
+
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -422,6 +424,56 @@ namespace UnitTests
 			Assert::IsTrue(err);
 		}
 
+		TEST_METHOD(INSERTION) {
+			std::stringstream out;
+			
+			int val_i = 48648;
+			Attribute attrI = val_i;
+			out << val_i;
+			Assert::AreEqual((int)Attribute::types::INTEGER, (int)attrI.getType());
+			Assert::AreEqual(val_i, (int)attrI);
+			Assert::AreEqual(val_i, std::stoi(out.str()));
+			out.str("");
+
+			double val_d = 4654.1651;
+			Attribute attrD = val_d;
+			out << std::setprecision(8) << attrD;
+			Assert::AreEqual((int)Attribute::types::DOUBLE, (int)attrD.getType());
+			Assert::AreEqual(val_d, (double)attrD);
+			Assert::AreEqual(val_d, std::stod(out.str()));
+			out.str("");
+
+			Attribute attrB = true;
+			out << attrB;
+			Assert::AreEqual((int)Attribute::types::BOOLEAN, (int)attrB.getType());
+			Assert::IsTrue((bool)attrB);
+			Assert::AreEqual((std::string)"true", out.str());
+			out.str("");
+
+			attrB = false;
+			out << attrB;
+			Assert::AreEqual((int)Attribute::types::BOOLEAN, (int)attrB.getType());
+			Assert::IsFalse((bool)attrB);
+			Assert::AreEqual((std::string)"false", out.str());
+			out.str("");
+			
+			char val_c = 'y';
+			Attribute attrC = val_c;
+			out << attrC;
+			Assert::AreEqual((int)Attribute::types::CHARACTER, (int)attrC.getType());
+			Assert::AreEqual(val_c, (char)attrC);
+			Assert::AreEqual(val_c, out.str().c_str()[0]);
+			out.str("");
+
+			std::string val_s = "gvasihrei";
+			Attribute attrS = val_s;
+			out << attrS;
+			Assert::AreEqual((int)Attribute::types::STRING, (int)attrS.getType());
+			Assert::AreEqual(val_s, (std::string)attrS);
+			Assert::AreEqual(val_s, out.str());
+			out.str("");
+			
+		}
 
 	};
 }
