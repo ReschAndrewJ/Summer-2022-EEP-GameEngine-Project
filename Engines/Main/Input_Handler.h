@@ -1,5 +1,5 @@
-#ifndef INPUT_HANDLER
-#define INPUT_HANDLER
+#ifndef INPUT_HANDLER_CLASS
+#define INPUT_HANDLER_CLASS
 
 #include "GLFW/glfw3.h"
 
@@ -154,4 +154,4 @@ public:
 };
 
 
-#endif // INPUT_HANDLER
+#endif // INPUT_HANDLER_CLASS

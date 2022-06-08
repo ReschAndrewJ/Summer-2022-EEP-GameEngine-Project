@@ -16,20 +16,7 @@
 #include <unordered_set>
 
 
-struct image_create_info {
-	std::string identifier;
-	std::string graphicsPipeline;
-
-	std::string vertShaderPath;
-	std::string fragShaderPath;
-
-	uint32_t pushConstantsSizeBytes = 0;
-	std::vector<char> initalPushConstantsValues;
-
-	unsigned int texture_rows = 0;
-	unsigned int texture_columns = 0;
-	std::vector<char> pixels;
-};
+#include "image_create_info.h"
 
 class Graphics_Engine
 {
@@ -46,7 +33,7 @@ public:
 
 
 private:
-	std::unordered_map<std::string, image_create_info> imageCreateQueue{}; // sets and maps search faster than vectors
+	std::unordered_map<std::string, image_create_info> imageCreateQueue{}; // sets and maps to detect duplicate entries
 	std::unordered_set<std::string> imageDestroyQueue{};
 	std::unordered_map<std::string, std::vector<char>> pushConstantUpdateQueue{};
 

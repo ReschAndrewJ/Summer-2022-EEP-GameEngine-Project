@@ -1,4 +1,4 @@
-#define TEST_RUNGRAPHICSENGINE
+//#define TEST_RUNGRAPHICSENGINE
 #ifdef TEST_RUNGRAPHICSENGINE
 
 #include "Graphics_Engine.h"

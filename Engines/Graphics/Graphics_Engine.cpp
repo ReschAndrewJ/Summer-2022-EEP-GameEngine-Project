@@ -1051,6 +1051,7 @@ void Graphics_Engine::queueDestroyImage(std::string imageIdentifier) {
 
 void Graphics_Engine::destroyQueuedImages() {
 	for (auto& imgIdentifier : imageDestroyQueue) {
+		if (!images.count(imgIdentifier)) continue;
 		Graphics_Image& image = images[imgIdentifier];
 		vkDestroyDescriptorPool(logicalDevice, image.descriptorPool, nullptr);
 		vkDestroyImageView(logicalDevice, image.textureImageView, nullptr);
@@ -1062,6 +1063,7 @@ void Graphics_Engine::destroyQueuedImages() {
 }
 
 void Graphics_Engine::createQueuedImages() {
+	if (imageCreateQueue.size() == 0) return;
 	VkBuffer pixelStagingBuffer;
 	VkDeviceMemory stagingBufferMemory;
 	VkDeviceSize stagingBufferSize = 0;
@@ -1379,6 +1381,7 @@ void Graphics_Engine::queuePushConstantsUpdate(std::string imgIdentifier, std::v
 
 void Graphics_Engine::updatePushConstants() {
 	for (auto& push : pushConstantUpdateQueue) {
+		if (!images.count(push.first)) continue;
 		Graphics_Image& image = images[push.first];
 
 		image.pushConstants = std::move(push.second);
