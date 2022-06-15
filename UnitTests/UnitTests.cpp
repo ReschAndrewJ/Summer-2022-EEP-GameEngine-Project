@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "CppUnitTest.h"
 
+#define UNIT_TESTS
+
 #include "../Attribute/Attribute.h"
 #include "../Attribute/Attribute.cpp"
 
@@ -20,6 +22,7 @@
 #include "../Object_Loader/Object_Loader.cpp"
 #undef private
 #undef protected
+
 
 
 #include <iomanip>
@@ -522,7 +525,7 @@ namespace UnitTests
 			test_object.identifier = "test_object";
 			test_object.objectContainerPtr = &objects;
 			objects.insert({ test_object.identifier, &test_object});
-			Assert::IsTrue(std::addressof(test_object) == std::addressof(test_object.getObject("test_object")));
+			Assert::IsTrue(std::addressof(test_object) == std::addressof(*test_object.getObject("test_object")));
 		}
 		TEST_METHOD(MockObjectCreateQueue) {
 			std::unordered_map<std::string, Object*> objects;
@@ -531,7 +534,7 @@ namespace UnitTests
 			test_object.objectContainerPtr = &objects;
 			test_object.identifier = "test_object";
 			objects.insert({ test_object.identifier, &test_object });
-			test_object.objectCreationQueue = &mockCreateQueue;
+			test_object.objectCreationQueuePtr = &mockCreateQueue;
 			test_object.queueCreateObject("mock_path", "mock_object", "mock_parent");
 			Assert::IsTrue(mockCreateQueue.size() == 1);
 			Assert::IsTrue(std::get<1>(mockCreateQueue.back()) == "mock_object");

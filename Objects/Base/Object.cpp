@@ -3,13 +3,16 @@
 
 
 Object::Object() {
-	addClassIdentifier(OBJECT_BASE);
-	addRequestedPointer(PTR_IDENTIFIER::OBJ_CONTAINER_PTR, objectContainerPtr);
-	addRequestedPointer(PTR_IDENTIFIER::OBJ_CREATION_QUEUE_PTR, objectCreationQueue);
-	addRequestedPointer(PTR_IDENTIFIER::OBJ_DESTRUCTION_QUEUE_PTR, objectDestructionQueue);
+	addClassIdentifier(OBJECT_CLASS_BASE);
+
+	addRequestedPointer(PTR_IDENTIFIER::OBJ_CONTAINER_PTR, &objectContainerPtr);
+	addRequestedPointer(PTR_IDENTIFIER::OBJ_CREATION_QUEUE_PTR, &objectCreationQueuePtr);
+	addRequestedPointer(PTR_IDENTIFIER::OBJ_DESTRUCTION_QUEUE_PTR, &objectDestructionQueuePtr);
+
 	identifier = "unnamed_object";
 	parent = "";
 }
+Object::~Object() {}
 
 
 void Object::createAttribute(std::string attributeName, Attribute::types type) {
@@ -27,6 +30,20 @@ void Object::addRequestedPointer(PTR_IDENTIFIER ptrEnum, void* ptr) {
 }
 
 
+void Object::addProcessFunction(void(*func)(Object*, float)) {
+	process_functions.insert(func);
+}
+
+
+void Object::addAfterCreationFunction(void(*func)(Object*)) {
+	afterCreation_functions.insert(func);
+}
+
+
+void Object::addBeforeDestructionFunction(void(*func)(Object*)) {
+	beforeDestruction_functions.insert(func);
+}
+
 
 std::string Object::getIdentifier() const {
 	return identifier;
@@ -43,18 +60,19 @@ std::unordered_set<std::string>& Object::getChildrenIdentifiers() {
 }
 
 
-Object& Object::getObject(std::string identifier) {
-	return *objectContainerPtr->operator[](identifier);
+Object* Object::getObject(std::string identifier) {
+	if (identifier.empty()) return nullptr;
+	return objectContainerPtr->at(identifier);
 }
 
 
 void Object::queueCreateObject(std::string filepath, std::string objectName, std::string objectParent) {
-	objectCreationQueue->push_back({ filepath, objectName, objectParent });
+	objectCreationQueuePtr->push_back({ filepath, objectName, objectParent });
 }
 
 
 void Object::queueDestroyObject(std::string objectIdentifier) {
-	objectDestructionQueue->insert(objectIdentifier);
+	objectDestructionQueuePtr->insert(objectIdentifier);
 }
 
 

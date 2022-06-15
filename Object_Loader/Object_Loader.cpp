@@ -2,10 +2,15 @@
 
 #include <fstream>
 
+
+#ifndef UNIT_TESTS
 // include derived object classes
+#include "../Objects/Spatial/Object_Spatial.h"
+#include "../Objects/Sprite/Object_Sprite.h"
+#include "../Objects/Camera/Object_Camera.h"
 
 
-#ifndef NDEBUG
+#else
 #include "../Objects/Test/Object_Test1.h"
 #endif
 //
@@ -17,6 +22,7 @@ std::pair<Object*, std::vector<std::pair<std::string, std::string>>> Object_Load
 	}
 	if (!loadedObjectInfos.count({ filepath + '/' + identifier})) {
 		std::string err = "No instance data: " + filepath + '/' + identifier;
+		printf(err.c_str());
 		throw std::runtime_error(err);
 	}
 	
@@ -25,16 +31,20 @@ std::pair<Object*, std::vector<std::pair<std::string, std::string>>> Object_Load
 	Object_Info& ObjectInfo = loadedObjectInfos.at(filepath + '/' + identifier);
 	Object* newObject = nullptr;
 
-	if (ObjectInfo.class_identifier == OBJECT_BASE) newObject = new Object();
+	if (ObjectInfo.class_identifier == OBJECT_CLASS_BASE) newObject = new Object();
+#ifndef UNIT_TESTS
 	// else if derived classes
+	else if (ObjectInfo.class_identifier == OBJECT_CLASS_SPATIAL) newObject = new Object_Spatial();
+	else if (ObjectInfo.class_identifier == OBJECT_CLASS_SPRITE) newObject = new Object_Sprite();
+	else if (ObjectInfo.class_identifier == OBJECT_CLASS_CAMERA) newObject = new Object_Camera();
 
-
-#ifndef NDEBUG
-	if (ObjectInfo.class_identifier == OBJECT_TEST1) newObject = new Object_Test1();
+#else
+	else  if (ObjectInfo.class_identifier == OBJECT_CLASS_TEST1) newObject = new Object_Test1();
 #endif
 	//
 	if (newObject == nullptr) {
 		std::string err = "attempted to load object with unmanaged object class: " + ObjectInfo.class_identifier;
+		printf(err.c_str());
 		throw std::runtime_error(err);
 	}
 
@@ -55,6 +65,7 @@ void Object_Loader::loadDataFromInstFile(std::string filepath) {
 	fileStream.open(filepath);
 	if (!fileStream.is_open()) {
 		std::string err = "failed to open file: " + filepath;
+		printf(err.c_str());
 		throw std::runtime_error(err);
 	}
 
@@ -139,8 +150,11 @@ void Object_Loader::loadDataFromInstFile(std::string filepath) {
 
 			// get child filepath
 			std::string child_filepath;
+
+			char stopChar = ' ';
+			if (line[startPoint] == '"') { stopChar = '"'; ++startPoint; }
 			for (size_t i = startPoint; i < line.size(); ++i) {
-				if (line[i] != ' ') child_filepath.push_back(line[i]);
+				if (line[i] != stopChar) child_filepath.push_back(line[i]);
 				else {
 					startPoint = i;
 					break;
@@ -285,6 +299,7 @@ void Object_Loader::loadDataFromInstFile(std::string filepath) {
 			else if (val_as_string == "false") attr_val = false;
 			else {
 			std::string err = "invalid value in inst file: " + filepath + " for boolean attribute: " + attr_name;
+			printf(err.c_str());
 				throw std::runtime_error(err);
 			}
 
@@ -366,7 +381,9 @@ void Object_Loader::loadDataFromInstFile(std::string filepath) {
 			continue;
 		} // String
 
-		throw std::runtime_error("invalid line number "+std::to_string(lineNumber)+": " + line);
+		std::string err = "invalid line number " + std::to_string(lineNumber) + ": " + line;
+		printf(err.c_str());
+		throw std::runtime_error(err);
 	}
 	loadedObjectInfos.insert({ filepath + '/' + currentInfo.name_id, currentInfo });
 

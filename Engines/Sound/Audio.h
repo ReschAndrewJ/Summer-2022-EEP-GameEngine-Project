@@ -6,8 +6,10 @@
 // Abstract audio class to be managed by the sound engine
 class Audio {
 public:
+	virtual ~Audio();
+
 	// load the audio to be played from a file
-	virtual void load(std::string) = 0;
+	virtual bool load(std::string) = 0;
 
 	// start or resume playing the audio
 	virtual void play() = 0;
@@ -15,6 +17,11 @@ public:
 	virtual void pause() = 0;
 	// stop playing the audio
 	virtual void stop() = 0;
+
+	virtual bool isPlaying();
+
+	virtual void setVolume(float) = 0;
+	virtual float getVolume() = 0;
 
 };
 

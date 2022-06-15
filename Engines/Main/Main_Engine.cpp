@@ -18,8 +18,11 @@ void Main_Engine::start(engine_start_info startInfo) {
 
 	graphicsEngine.startupEngine(displayWindow);
 
+	Object* rootObj = new Object();
+	rootObj->identifier = "ROOT";
+	objectsContainer["ROOT"] = rootObj;
 	if (!startInfo.rootObject_filePath.empty() && !startInfo.rootObject_objectName.empty()) {
-		objectLoader.createInstance(startInfo.rootObject_filePath, startInfo.rootObject_objectName);
+		objectCreationQueue.push_back({ startInfo.rootObject_filePath, startInfo.rootObject_objectName, "ROOT" });
 	}
 
 	shortestFrameLength = 1.0f / startInfo.maxFramerate;
@@ -33,6 +36,7 @@ void Main_Engine::start(engine_start_info startInfo) {
 
 
 void Main_Engine::end() {
+	soundEngine.clearEngine();
 	graphicsEngine.shutdownEngine();
 	glfwTerminate();
 
@@ -62,6 +66,12 @@ void Main_Engine::semaphore::arriveAtSemaphore(std::atomic<bool>* signal = nullp
 		reverseThreadCount = threadsNeededToPass; // reset reverseThreadCount
 	}
 	lock.unlock();
+}
+
+
+Main_Engine::semaphore::semaphore(int threads) {
+	threadsNeededToPass = threads;
+	reverseThreadCount = threads;
 }
 
 
@@ -173,16 +183,19 @@ void Main_Engine::createObjectsInQueue() {
 		newObj.first->identifier = identifer;
 		newObj.first->parent = std::get<2>(queuedObj);
 		// handle requested pointers
-		for (auto& ptr : newObj.first->requestedPointers) {
-			switch (ptr.first) {
-				case PTR_IDENTIFIER::INPUT_HANDLER_PTR: ptr.second = &inputHandler; break;
-				case PTR_IDENTIFIER::OBJ_CONTAINER_PTR: ptr.second = &objectsContainer; break;
-				case PTR_IDENTIFIER::OBJ_CREATION_QUEUE_PTR: ptr.second = &objectCreationQueue; break;
-				case PTR_IDENTIFIER::OBJ_DESTRUCTION_QUEUE_PTR: ptr.second = &objectDestructionQueue; break;
-				case PTR_IDENTIFIER::IMG_CREATION_QUEUE_PTR: ptr.second = &imageCreationQueue; break;
-				case PTR_IDENTIFIER::IMG_DESTRUCTION_QUEUE_PTR: ptr.second = &imageDestructionQueue; break;
-				case PTR_IDENTIFIER::PUSH_UPDATE_QUEUE_PTR: ptr.second = &pushConstantsUpdateQueue; break;
-				default: ptr.second = nullptr; break;
+		for (auto& ptrIt : newObj.first->requestedPointers) {
+			void** pointer = reinterpret_cast<void**>(ptrIt.second);
+			switch (ptrIt.first) {
+				case PTR_IDENTIFIER::INPUT_HANDLER_PTR: *(pointer) = &inputHandler; break;
+				case PTR_IDENTIFIER::OBJ_CONTAINER_PTR: *(pointer) = &objectsContainer; break;
+				case PTR_IDENTIFIER::OBJ_CREATION_QUEUE_PTR: *(pointer) = &objectCreationQueue; break;
+				case PTR_IDENTIFIER::OBJ_DESTRUCTION_QUEUE_PTR: *(pointer) = &objectDestructionQueue; break;
+				case PTR_IDENTIFIER::IMG_CREATION_QUEUE_PTR: *(pointer) = &imageCreationQueue; break;
+				case PTR_IDENTIFIER::IMG_DESTRUCTION_QUEUE_PTR: *(pointer) = &imageDestructionQueue; break;
+				case PTR_IDENTIFIER::PUSH_UPDATE_QUEUE_PTR: *(pointer) = &pushConstantsUpdateQueue; break;
+				case PTR_IDENTIFIER::WINDOW_PTR: *(pointer) = &displayWindow; break;
+				case PTR_IDENTIFIER::SOUND_ENGINE_PTR: *(pointer) = &soundEngine; break;
+				default: *(pointer) = nullptr; break;
 			}
 		}
 		objectsContainer.insert({ identifer, newObj.first });
@@ -244,7 +257,8 @@ void Main_Engine::sendImageCreationQueue() {
 void Main_Engine::sendImageDestructionQueue() {
 
 	for (auto& img : imageDestructionQueue) {
-		graphicsEngine.queueDestroyImage(img);
+		if (!objectsContainer.count(img.first)) continue; // skip push update if the image owner object does not exist
+		graphicsEngine.queueDestroyImage(objectsContainer.at(img.first)->getAttribute(img.second));
 	}
 	imageDestructionQueue.clear();
 }

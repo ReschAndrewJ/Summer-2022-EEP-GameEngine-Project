@@ -1,5 +1,4 @@
 #ifndef OBJECT_BASE
-// (const char[12])"Object_Base"
 #define OBJECT_BASE OBJECT_BASE 
 
 #include <string>
@@ -12,13 +11,14 @@
 
 #include "../../Engines/Main/PTR_IDENTIFIER_ENUMS.h"
 
-const auto OBJECT_BASE = "Object_Base";
+const auto OBJECT_CLASS_BASE = "Object_Base";
 
 class Object
 {
 	friend class Main_Engine; // the main engine owns and manages the objects
 public:
 	Object();
+	virtual ~Object();
 private:
 	// the member attributes of the object 
 	std::unordered_map<std::string, Attribute> attributes;
@@ -38,14 +38,15 @@ private:
 	std::unordered_map<std::string, Object*>* objectContainerPtr;
 	/* points to the object creation queue in the main engine
 	<string filepath, string objectName, string objectParent>*/
-	std::vector<std::tuple<std::string, std::string, std::string>>* objectCreationQueue;
+	std::vector<std::tuple<std::string, std::string, std::string>>* objectCreationQueuePtr;
 	/* points to the object destruction queue in the main engine */
-	std::unordered_set<std::string>* objectDestructionQueue;
+	std::unordered_set<std::string>* objectDestructionQueuePtr;
 
 	std::unordered_map<PTR_IDENTIFIER, void*> requestedPointers;
 
 protected:
-	// insert a new attribute into the attributes map
+	/* insert a new attribute into the attributes map,
+	should be called in the class constructor */
 	void createAttribute(std::string attributeName, Attribute::types attribute_type);
 
 	/* assigns an identification string for the object class,
@@ -53,8 +54,21 @@ protected:
 	void addClassIdentifier(std::string identifier);
 
 	/* adds a pointer to be requested from the main engine when the object is created,
+	addRequestedPonter(Identifier, T** ptr),
 	should be called in the class constructor */
 	void addRequestedPointer(PTR_IDENTIFIER, void*);
+
+	/* adds a function to be called every frame,
+	should be called in the class constructor */
+	void addProcessFunction(void(*func)(Object*, float));
+
+	/* adds a function to be called after the creation step of the frame it is created during,
+	should be called in the class constructor */
+	void addAfterCreationFunction(void(*func)(Object*));
+
+	/* adds a function to be called right before the destriction step of the frame it is destroyed during,
+	should be called in the class constructor */
+	void addBeforeDestructionFunction(void(*func)(Object*));
 
 public:
 	
@@ -73,8 +87,8 @@ public:
 	// returns the set of string identifiers of the object's child objects
 	std::unordered_set<std::string>& getChildrenIdentifiers();
 
-	// returns a reference to the requested object in the objects container
-	Object& getObject(std::string objectName);
+	// returns a pointer to the requested object in the objects container
+	Object* getObject(std::string objectName);
 
 	// adds an object to the object creation queue in the main engine
 	void queueCreateObject(std::string filepath, std::string objectName, std::string objectParent);

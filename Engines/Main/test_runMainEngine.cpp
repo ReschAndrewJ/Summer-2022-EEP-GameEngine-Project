@@ -1,4 +1,4 @@
-#define TEST_RUNMAINENGINE
+//#define TEST_RUNMAINENGINE
 #ifdef TEST_RUNMAINENGINE
 
 #include "Main_Engine.h"

@@ -627,25 +627,26 @@ void Graphics_Engine::createDepthImage() {
 void Graphics_Engine::createTextureSampler() {
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-	samplerInfo.magFilter = VK_FILTER_NEAREST; // nearest = no oversample filtering
+	samplerInfo.magFilter = VK_FILTER_NEAREST; // nearest = no oversample filtering (imageRes > screenRes)
 	samplerInfo.minFilter = VK_FILTER_NEAREST;
 	samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 
+	/*
 	VkPhysicalDeviceFeatures features;
 	vkGetPhysicalDeviceFeatures(physicalDevice, &features);
 	if (features.samplerAnisotropy) {
-		samplerInfo.anisotropyEnable = VK_TRUE; // true = enable undersample filtering
+		samplerInfo.anisotropyEnable = VK_TRUE; // true = enable undersample filtering (screenRes > imageRes)
 		VkPhysicalDeviceProperties properties;
 		vkGetPhysicalDeviceProperties(physicalDevice, &properties);
 		samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy; // max undersample filtering, 
 																			//lower value = better performance
-	}
-	else {
+	}*/
+	//else {
 		samplerInfo.anisotropyEnable = VK_FALSE;
 		samplerInfo.maxAnisotropy = 1;
-	}
+	//}
 
 	samplerInfo.borderColor = VK_BORDER_COLOR_INT_TRANSPARENT_BLACK;
 	samplerInfo.unnormalizedCoordinates = VK_FALSE; // false = [0,1) texture coordinates

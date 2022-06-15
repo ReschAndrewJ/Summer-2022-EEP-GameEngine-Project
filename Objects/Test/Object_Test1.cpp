@@ -1,3 +1,4 @@
+#ifdef UNIT_TESTS
 #include "Object_Test1.h"
 
 
@@ -9,3 +10,4 @@ Object_Test1::Object_Test1() {
 	createAttribute("charA", Attribute::types::CHARACTER);
 	createAttribute("stringA", Attribute::types::STRING);
 }
+#endif

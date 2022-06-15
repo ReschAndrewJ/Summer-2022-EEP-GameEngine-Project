@@ -1,0 +1,110 @@
+# test instance file to ensure the engine components interact properly
+
+
+
+
+Object OrthoCamera Object_Camera
+
+Double SpatialPosX 0
+Double SpatialPosY 0 
+Double SpatialPosZ 0
+
+Double CameraWidth 256
+Double CameraHeight 256
+Double MinCameraDepth 0.1
+Double MaxCameraDepth 50
+
+Double FacingX 0
+Double FacingZ -1
+Double FacingRotation 0
+
+Boolean CameraOrthographic true
+
+Child Here testSprite1
+Child Here testSprite2
+Child Here testSprite3
+Child Here testSprite4
+
+
+Object PerspectiveCamera Object_Camera
+
+Double SpatialPosX 0
+Double SpatialPosY 60
+Double SpatialPosZ 60
+
+Double MinCameraDepth 0.1
+Double MaxCameraDepth 500
+
+Double FacingY -1
+Double FacingZ -1
+Double FacingRotation 0
+
+Boolean CameraOrthographic false
+Double CameraFOV 90
+
+
+Child Here testSprite1
+Child Here testSprite2
+Child Here testSprite3
+Child Here testSprite4
+
+
+Object testSprite1 Object_Sprite
+
+Double SpatialPosX 0
+Double SpatialPosY 0 
+Double SpatialPosZ -0.5
+
+Integer SpriteWidth 32
+Integer SpriteHeight 32
+
+Double SpatialScaleX 1
+Double SpatialScaleY 1
+
+Boolean SpriteIsVisible true
+
+String SpriteFilepath "./test_runFullEngine/test_img1.png"
+
+
+Object testSprite2 Object_Sprite
+
+Double SpatialPosX 32
+Double SpatialPosY 32
+Double SpatialPosZ -5
+
+Integer SpriteWidth 32
+Integer SpriteHeight 32
+
+String SpriteFilepath "./test_runFullEngine/test_img2.png"
+
+
+Object testSprite3 Object_Sprite
+
+Double SpatialPosX 16
+Double SpatialPosY 16
+Double SpatialPosZ -15
+
+Integer SpriteWidth 48
+Integer SpriteHeight 48
+
+Double FacingRotation 45
+
+String SpriteFilepath "./test_runFullEngine/test_img3.png"
+
+
+Object testSprite4 Object_Sprite
+
+Double SpatialPosX -64
+Double SpatialPosY -64
+Double SpatialPosZ -30
+
+Integer SpriteWidth 32
+Integer SpriteHeight 32
+
+Double FacingRotation 0
+
+Double FacingX 0
+Double FacingZ -1
+
+String SpriteFilepath "./test_runFullEngine/test_img4.jpg"
+

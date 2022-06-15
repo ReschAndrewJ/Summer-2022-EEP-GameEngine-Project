@@ -4,7 +4,7 @@
 
 #include "../../Object_Loader/Object_Loader.h"
 #include "../Graphics/Graphics_Engine.h"
-//#include "../Sound/Sound_Engine.h" not implemented
+#include "../Sound/Sound_Engine.h"
 #include "Input_Handler.h"
 
 #include "PTR_IDENTIFIER_ENUMS.h"
@@ -47,7 +47,7 @@ private:
 
 	Object_Loader objectLoader;
 	Graphics_Engine graphicsEngine;
-	//Sound_Engine soundEngine;
+	Sound_Engine soundEngine;
 	Input_Handler inputHandler;
 
 	
@@ -63,8 +63,8 @@ private:
 	// 
 	// <{owner object identifier, image identifier attribute name}, imageCreateInfo>
 	std::map<std::pair<std::string, std::string>, image_create_info> imageCreationQueue;
-	// <image identifier>
-	std::unordered_set<std::string> imageDestructionQueue;
+	// <owner object identifier, image identifier attribute name>
+	std::set<std::pair<std::string, std::string>> imageDestructionQueue;
 	// <{owner object identifier, image identifier attribute name}, pushConstantsValues>
 	std::map<std::pair<std::string, std::string>, std::vector<char>> pushConstantsUpdateQueue;
 
@@ -78,14 +78,16 @@ private:
 	booleans to true when both threads have called the semaphore's arrive function */
 	struct semaphore {
 		std::mutex lock;
-		int threadsNeededToPass = 2;
-		int reverseThreadCount = threadsNeededToPass;
+		int threadsNeededToPass = 0;
+		int reverseThreadCount = 0;
 		std::vector<std::atomic<bool>*> signals;
+		semaphore(int);
 		void arriveAtSemaphore(std::atomic<bool>* signal);
 	};
-	semaphore midFrameSemaphore;
-	semaphore endFrameSemaphore;
-	semaphore deltaUpdateSemaphore;
+
+	semaphore midFrameSemaphore = semaphore(2);
+	semaphore endFrameSemaphore = semaphore(2);
+	semaphore deltaUpdateSemaphore = semaphore(2);
 
 	float shortestFrameLength;
 	std::atomic<bool> endLoop = false;
