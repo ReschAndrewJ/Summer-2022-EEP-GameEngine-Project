@@ -8,6 +8,7 @@
 #include "../Objects/Spatial/Object_Spatial.h"
 #include "../Objects/Sprite/Object_Sprite.h"
 #include "../Objects/Camera/Object_Camera.h"
+#include "../Objects/Collision/Object_Collision.h"
 
 
 #else
@@ -37,6 +38,8 @@ std::pair<Object*, std::vector<std::pair<std::string, std::string>>> Object_Load
 	else if (ObjectInfo.class_identifier == OBJECT_CLASS_SPATIAL) newObject = new Object_Spatial();
 	else if (ObjectInfo.class_identifier == OBJECT_CLASS_SPRITE) newObject = new Object_Sprite();
 	else if (ObjectInfo.class_identifier == OBJECT_CLASS_CAMERA) newObject = new Object_Camera();
+	else if (ObjectInfo.class_identifier == OBJECT_CLASS_COLLISION) newObject = new Object_Collision();
+
 
 #else
 	else  if (ObjectInfo.class_identifier == OBJECT_CLASS_TEST1) newObject = new Object_Test1();

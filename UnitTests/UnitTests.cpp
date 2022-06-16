@@ -506,7 +506,7 @@ namespace UnitTests
 		TEST_METHOD(MockCreateDerived) {
 			Object test_object;
 			test_object.addClassIdentifier("test_class");
-			Assert::IsTrue(test_object.is_class(OBJECT_BASE));
+			Assert::IsTrue(test_object.is_class(OBJECT_CLASS_BASE));
 			Assert::IsTrue(test_object.is_class("test_class"));
 			Assert::AreEqual((std::string)"unnamed_object", test_object.getIdentifier());
 			test_object.identifier = "test_object";
@@ -683,8 +683,8 @@ namespace UnitTests
 				
 				for (size_t objNum = 1; objNum <= numberOfObjects; ++objNum) {
 					testFile << std::endl;
-					testFile << "# Object trick_comment" << objNum << " " << OBJECT_BASE << std::endl;
-					testFile << "Object test_object" << objNum << " " << OBJECT_TEST1 << std::endl;
+					testFile << "# Object trick_comment" << objNum << " " << OBJECT_CLASS_BASE << std::endl;
+					testFile << "Object test_object" << objNum << " " << OBJECT_CLASS_TEST1 << std::endl;
 					testFile << "Integer intA " << objNum << std::endl;
 					testFile << "Double doubleA " << fNum << "." << objNum << std::endl;
 					testFile << "Boolean boolA " << (objNum % 2 ? "true" : "false") << std::endl;
