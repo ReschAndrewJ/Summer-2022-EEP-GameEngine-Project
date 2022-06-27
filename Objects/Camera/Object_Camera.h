@@ -8,16 +8,12 @@
 
 const auto OBJECT_CLASS_CAMERA = "Object_Camera";
 
-class Object_Camera : public Object_Spatial {
+const auto ATTRIBUTE_CAMERA_DEPTH_MIN = "MinCameraDepth";
+const auto ATTRIBUTE_CAMERA_DEPTH_MAX = "MaxCameraDepth";
+const auto ATTRIBUTE_CAMERA_FOV = "CameraFOV";
 
-	const char* ATTRIBUTE_CAMERA_DEPTH_MIN = "MinCameraDepth";
-	const char* ATTRIBUTE_CAMERA_DEPTH_MAX = "MaxCameraDepth";
-	const char* ATTRIBUTE_CAMERA_WIDTH = "CameraWidth";
-	const char* ATTRIBUTE_CAMERA_HEIGHT = "CameraHeight";
-	const char* ATTRIBUTE_CAMERA_ORTHOGRAPHIC = "CameraOrthographic";
-	const char* ATTRIBUTE_CAMERA_FOV = "CameraFOV";
-	
-	
+class Object_Camera : public Object_Spatial {
+protected:
 	GLFWwindow** windowPtr;
 
 public:
@@ -28,7 +24,7 @@ public:
 	* the camera conditionally needs to pass its tranformation matrix on to child nodes,
 	* (i.e. just for nodes that are visual),
 	* this distinction cannot be made inside the spatial transformation function and
-	* so a seperate function is needed to be called directly by the descendant object
+	* so a seperate function is needed to be called directly by the descendant object when applicable
 	*/
 
 	// override the transformation matrix to not affect the passed matrix

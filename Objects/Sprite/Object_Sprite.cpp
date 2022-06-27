@@ -3,9 +3,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-#include "glm/gtc/matrix_transform.hpp"
-
-#include "../Camera/Object_Camera.h"
 
 Object_Sprite::Object_Sprite() {
 	addClassIdentifier(OBJECT_CLASS_SPRITE);
@@ -47,7 +44,6 @@ void Object_Sprite::beforeDestructionFunction(Object* self) {
 
 struct imgPush_struct {
 	glm::mat4 transformationMatrix;
-	glm::vec2 textureCoordinates[4];
 	int isVisible;
 };
 
@@ -67,7 +63,7 @@ void Object_Sprite::loadImage() {
 	}
 	imgInfo.pixels.resize((size_t)texWidth * texHeight * 4);
 	for (size_t i = 0; i < (size_t)texWidth * texHeight * 4; ++i) {
-		imgInfo.pixels[i] = ((char*)pixels)[i];
+		imgInfo.pixels[i] = ((unsigned char*)pixels)[i];
 	}
 	imgInfo.texture_columns = texWidth;
 	imgInfo.texture_rows = texHeight;
@@ -75,17 +71,13 @@ void Object_Sprite::loadImage() {
 	
 	imgPush_struct initPushConstants{};
 	initPushConstants.isVisible = 0;
-	initPushConstants.textureCoordinates[0] = { 0,0 };
-	initPushConstants.textureCoordinates[1] = { 1,0 };
-	initPushConstants.textureCoordinates[2] = { 1,1, };
-	initPushConstants.textureCoordinates[3] = { 1,1 };
 	initPushConstants.transformationMatrix = glm::mat4(1.0f);
 
 	imgInfo.pushConstantsSizeBytes = sizeof(imgPush_struct);
 	imgInfo.initalPushConstantsValues.resize(imgInfo.pushConstantsSizeBytes);
 
 	for (size_t i = 0; i < imgInfo.pushConstantsSizeBytes; ++i) {
-		imgInfo.initalPushConstantsValues[i] = ((char*)&initPushConstants)[i];
+		imgInfo.initalPushConstantsValues[i] = ((unsigned char*)&initPushConstants)[i];
 	}
 
 	std::pair<std::string, std::string> key = { getIdentifier(), ATTRIBUTE_SPRITE_IMG_IDENTIFIER };
@@ -98,13 +90,13 @@ void Object_Sprite::unloadImage() {
 	(*imageDestructionQueuePtr).insert({ getIdentifier(), ATTRIBUTE_SPRITE_IMG_IDENTIFIER});
 }
 
+
+#include "glm/gtc/matrix_transform.hpp"
+#include "../Camera/Object_Camera.h"
+
 void Object_Sprite::updatePushConstants() {
 	imgPush_struct pushValues{};
 	pushValues.isVisible = (bool)getAttribute(ATTRIBUTE_SPRITE_VISIBLE) ? 1 : 0;
-	pushValues.textureCoordinates[0] = { 0,0 };
-	pushValues.textureCoordinates[1] = { 1,0 };
-	pushValues.textureCoordinates[2] = { 0,1 };
-	pushValues.textureCoordinates[3] = { 1,1 };
 	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), { getAttribute(ATTRIBUTE_SPRITE_WIDTH), getAttribute(ATTRIBUTE_SPRITE_HEIGHT), 0.0f });
 	
 	glm::mat4 cameraMat = glm::mat4(1.0);
@@ -121,9 +113,9 @@ void Object_Sprite::updatePushConstants() {
 	}
 	pushValues.transformationMatrix = cameraMat * getTransformationMatrix(scaleMat);
 
-	std::vector<char> pushValuesV(sizeof(imgPush_struct));
+	std::vector<unsigned char> pushValuesV(sizeof(imgPush_struct));
 	for (size_t i = 0; i < sizeof(imgPush_struct); ++i) {
-		pushValuesV[i] = ((char*)&pushValues)[i];
+		pushValuesV[i] = ((unsigned char*)&pushValues)[i];
 	}
 
 	std::pair<std::string, std::string> key = {getIdentifier(), ATTRIBUTE_SPRITE_IMG_IDENTIFIER};

@@ -8,23 +8,20 @@
 
 const auto OBJECT_CLASS_COLLISION = "Object_Collision";
 
+// the explicit dimensions of the collision object, are influenced by SpatialScale
+
+const auto ATTRIBUTE_COLLIDER_WIDTH = "ColliderWidth";
+const auto ATTRIBUTE_COLLIDER_HEIGHT = "ColliderHeight";
+const auto ATTRIBUTE_COLLIDER_DEPTH = "ColliderDepth";
+
+// a dimension can be ignored, such that if two object overlap in all non-ignored dimension
+// they are treated as colliding
+
+const auto ATTRIBUTE_COLLIDER_IGNORE_Z = "ColliderIgnoreZ";
+const auto ATTRIBUTE_COLLIDER_IGNORE_Y = "ColliderIgnoreY";
+const auto ATTRIBUTE_COLLIDER_IGNORE_X = "ColliderIgnoreX";
 
 class Object_Collision : public Object_Spatial {
-
-public:
-	// the explicit dimensions of the collision object, are influenced by SpatialScale
-
-	const char* ATTRIBUTE_COLLIDER_WIDTH = "ColliderWidth";
-	const char* ATTRIBUTE_COLLIDER_HEIGHT = "ColliderHeight";
-	const char* ATTRIBUTE_COLLIDER_DEPTH = "ColliderDepth";
-
-	// a dimension can be ignored, such that if two object overlap in all non-ignored dimension
-	// they are treated as colliding
-
-	const char* ATTRIBUTE_COLLIDER_IGNORE_Z = "ColliderIgnoreZ";
-	const char* ATTRIBUTE_COLLIDER_IGNORE_Y = "ColliderIgnoreY";
-	const char* ATTRIBUTE_COLLIDER_IGNORE_X = "ColliderIgnoreX";
-
 
 protected:
 	std::unordered_map<std::string, Object*>* objectContainerPtr;
@@ -39,6 +36,8 @@ public:
 
 protected:
 	virtual bool checkIsColliding(Object_Collision*);
+
+private:
 	bool checkforAlignedBBColision(Object_Collision*);
 	bool checkforUnalignedBBCollision(Object_Collision*);
 

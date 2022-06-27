@@ -10,19 +10,16 @@ Object_Spatial::Object_Spatial() {
 	createAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, Attribute::types::DOUBLE);
 	createAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, Attribute::types::DOUBLE);
 
-	createAttribute(ATTRIBUTE_SPATIAL_FACING_X, Attribute::types::DOUBLE);
-	createAttribute(ATTRIBUTE_SPATIAL_FACING_Y, Attribute::types::DOUBLE);
-	createAttribute(ATTRIBUTE_SPATIAL_FACING_Z, Attribute::types::DOUBLE);
-	setAttribute(ATTRIBUTE_SPATIAL_FACING_Z, -1.0);
-
-	createAttribute(ATTRIBUTE_SPATIAL_FACING_ROTATION, Attribute::types::DOUBLE);
+	createAttribute(ATTRIBUTE_SPATIAL_ROTATE_NOD, Attribute::types::DOUBLE);
+	createAttribute(ATTRIBUTE_SPATIAL_ROTATE_TURN, Attribute::types::DOUBLE);
+	createAttribute(ATTRIBUTE_SPATIAL_ROTATE_TILT, Attribute::types::DOUBLE);
 
 	createAttribute(ATTRIBUTE_SPATIAL_SCALE_X, Attribute::types::DOUBLE);
 	createAttribute(ATTRIBUTE_SPATIAL_SCALE_Y, Attribute::types::DOUBLE);
 	createAttribute(ATTRIBUTE_SPATIAL_SCALE_Z, Attribute::types::DOUBLE);
-	setAttribute(ATTRIBUTE_SPATIAL_SCALE_X, 1.0);
-	setAttribute(ATTRIBUTE_SPATIAL_SCALE_Y, 1.0);
-	setAttribute(ATTRIBUTE_SPATIAL_SCALE_Z, 1.0);
+	setAttribute(ATTRIBUTE_SPATIAL_SCALE_X, 1);
+	setAttribute(ATTRIBUTE_SPATIAL_SCALE_Y, 1);
+	setAttribute(ATTRIBUTE_SPATIAL_SCALE_Z, 1);
 
 	createAttribute(ATTRIBUTE_SPATIAL_PARENT_TRANSFORMATIONS_INHERIT, Attribute::types::BOOLEAN);
 	setAttribute(ATTRIBUTE_SPATIAL_PARENT_TRANSFORMATIONS_INHERIT, true);
@@ -38,19 +35,15 @@ glm::mat4 Object_Spatial::getTransformationMatrix(glm::mat4 childTransform) {
 		(float)getAttribute(ATTRIBUTE_SPATIAL_POSITION_Z) };
 	
 	glm::mat4 translationMat = glm::translate(glm::mat4(1.0), posV);
- 	
+	
+	// nod -> turn -> tilt
+	glm::mat4 rotationMat = glm::mat4(1.0f);
+	
+	rotationMat = glm::rotate(rotationMat, glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_ROTATE_NOD)), {1,0,0});
+	rotationMat = glm::rotate(rotationMat, glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_ROTATE_TURN)), { 0,1,0 });
+	glm::vec3 viewAxis = rotationMat * glm::vec4{ 0,0,1,0 };
+	rotationMat = glm::rotate(rotationMat,glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_ROTATE_TILT)), viewAxis);
 
-	glm::vec3 rotateFrom = glm::vec3{ 0.0f, 0.0f, -1.0f }; // rotate from default orientation
-	glm::vec3 facingV = glm::vec3{
-		(float)getAttribute(ATTRIBUTE_SPATIAL_FACING_X),
-		(float)getAttribute(ATTRIBUTE_SPATIAL_FACING_Y),
-		(float)getAttribute(ATTRIBUTE_SPATIAL_FACING_Z) };
-	
-	glm::mat4 rotationMat = rotateToVec(rotateFrom, facingV);
-	
-	// rotate about facing axis
-	rotationMat = glm::rotate(glm::mat4(1.0f), glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_FACING_ROTATION)), facingV) * rotationMat;
-	
 
 	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0), glm::vec3(
 		(float)getAttribute(ATTRIBUTE_SPATIAL_SCALE_X),

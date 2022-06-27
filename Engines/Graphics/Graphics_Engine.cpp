@@ -16,16 +16,19 @@ void Graphics_Engine::startupEngine(GLFWwindow* window) {
 	// setup validation layers
 	if (Validation_Layers::enableValidationLayers) {
 		if (!Validation_Layers::checkValidationLayersSupport()) {
-			throw std::runtime_error("tried to set up validation layers, but missing validation layer support");
+			std::string err = "tried to set up validation layers, but missing validation layer support\n";
+			printf(err.c_str());
 		}
-		vulkan_validation.setupDebugMessenger(vulkanInstance);
+		else {
+			vulkan_validation.setupDebugMessenger(vulkanInstance);
+		}
 	}
 	
 	// create draw surface
 	VkResult result = glfwCreateWindowSurface(vulkanInstance, window, nullptr, &surface);
 	if (result != VK_SUCCESS) {
-		std::string err = "failed to create window surface: VKResult " + std::to_string((int)result);
-		throw std::runtime_error(err);
+		std::string err = "failed to create window surface: VKResult " + std::to_string((int)result) + "\n";
+		printf(err.c_str());
 	}
 
 	// setup logical device
@@ -441,7 +444,8 @@ void Graphics_Engine::createRenderPass() {
 	renderPassInfo.pDependencies = &dependency;
 
 	if (vkCreateRenderPass(logicalDevice, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create render pass");
+		std::string err = "failed to create render pass\n";
+		printf(err.c_str());
 	}
 }
 
@@ -462,7 +466,9 @@ void Graphics_Engine::createFramebuffers() {
 		frameBufferInfo.layers = 1;
 
 		if (vkCreateFramebuffer(logicalDevice, &frameBufferInfo, nullptr, &framebuffers[i]) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create framebuffer");
+			std::string err = "failed to create framebuffer\n";
+			printf(err.c_str());
+			return;
 		}
 	}
 }
@@ -563,8 +569,9 @@ void Graphics_Engine::createVulkanImage(uint32_t width, uint32_t height, VkForma
 
 	VkResult result = vkCreateImage(logicalDevice, &imageInfo, nullptr, &image);
 	if (result != VK_SUCCESS) {
-		std::string err = "failed to create image, VkResult: " + std::to_string((int)result);
-		throw std::runtime_error(err);
+		std::string err = "failed to create image, VkResult: " + std::to_string((int)result) + "\n";
+		printf(err.c_str());
+		return;
 	}
 }
 
@@ -583,8 +590,8 @@ void Graphics_Engine::createVulkanImageView(VkImage image, VkImageView& imageVie
 
 	VkResult result = vkCreateImageView(logicalDevice, &viewInfo, nullptr, &imageView);
 	if (result != VK_SUCCESS) {
-		std::string err = "failed to create texture image view, VkResult: " + std::to_string((int)result);
-		throw std::runtime_error(err);
+		std::string err = "failed to create texture image view, VkResult: " + std::to_string((int)result) + "\n";
+		printf(err.c_str());
 	}
 }
 
@@ -693,7 +700,7 @@ void Graphics_Engine::setupGeneralImageMemory() {
 	VkMemoryRequirements imageMemRequirements;
 	vkGetImageMemoryRequirements(logicalDevice, setupImage, &imageMemRequirements);
 	imageMemoryAlignment = imageMemRequirements.alignment;
-
+	
 	VkPhysicalDeviceMemoryProperties memProperties;
 	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
 	uint32_t memTypeIndex = -1;
@@ -1101,9 +1108,9 @@ void Graphics_Engine::createQueuedImages() {
 		createDescriptors(image);
 
 		// increase size of staging buffer before buffer creation
-		stagingBufferSize += (imgSize);
+		stagingBufferSize += imgSize;
 	}
-
+	
 	// create staging buffer
 	createVulkanBuffer(stagingBufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
 		VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixelStagingBuffer, stagingBufferMemory);
@@ -1185,6 +1192,8 @@ void Graphics_Engine::createVulkanBuffer(VkDeviceSize size, VkBufferUsageFlags u
 	VkMemoryAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.allocationSize = size;
+	// buffer alignment correction
+	if (memRequirements.alignment > 0) allocInfo.allocationSize += memRequirements.alignment;
 	
 	VkPhysicalDeviceMemoryProperties memProperties;
 	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
@@ -1211,6 +1220,11 @@ void Graphics_Engine::createVulkanBuffer(VkDeviceSize size, VkBufferUsageFlags u
 //-
 
 void Graphics_Engine::bindImageMemoryAllocation(Graphics_Image& image, VkDeviceSize imageSize) {
+	if (imageSize == 0) {
+		std::string warning = "attempted to bind image of size zero to memory\n";
+		printf(warning.c_str());
+		return;
+	}
 	if (boundMemory.empty() && imageSize <= imageMemoryAllocationBytes) {
 		vkBindImageMemory(logicalDevice, image.textureImage, generalImageMemory, 0);
 		boundMemory[0] = imageSize;
@@ -1220,11 +1234,17 @@ void Graphics_Engine::bindImageMemoryAllocation(Graphics_Image& image, VkDeviceS
 	else {
 		for (auto it = boundMemory.begin(); it != boundMemory.end(); ++it) {
 			VkDeviceSize test_pos = it->first + it->second; // offset + size
-			// ignore alignment, images must all be the same format so alignment should already match
+			// apply image alignment correction
+			if (test_pos % imageMemoryAlignment > 0) test_pos += (imageMemoryAlignment - test_pos % imageMemoryAlignment);
 			// check if fits
 			if ((std::next(it) != boundMemory.end() && std::next(it)->first >= test_pos + imageSize)
 				|| (std::next(it) == boundMemory.end() && test_pos + imageSize <= imageMemoryAllocationBytes)) {
-				vkBindImageMemory(logicalDevice, image.textureImage, generalImageMemory, test_pos);
+				VkResult res = vkBindImageMemory(logicalDevice, image.textureImage, generalImageMemory, test_pos);
+				if (res != VK_SUCCESS) {
+					std::string err = "failed to bind image memory, VK_Result: " + std::to_string((int)res);
+					printf(err.c_str());
+					return;
+				}
 				boundMemory[test_pos] = imageSize;
 				image.textureMemoryOffset = test_pos;
 				return;
@@ -1232,7 +1252,8 @@ void Graphics_Engine::bindImageMemoryAllocation(Graphics_Image& image, VkDeviceS
 		}
 	}
 	// not enough allocated memory remaining
-	throw std::runtime_error("out of memory to allocate image");
+	std::string err = "out of memory to allocate image\n";
+	printf(err.c_str());
 	// potentially add compacting method if there is extra time
 }
 
@@ -1376,7 +1397,7 @@ void Graphics_Engine::createDescriptors(Graphics_Image& image) {
 
 //-
 
-void Graphics_Engine::queuePushConstantsUpdate(std::string imgIdentifier, std::vector<char>& data) {
+void Graphics_Engine::queuePushConstantsUpdate(std::string imgIdentifier, std::vector<unsigned char>& data) {
 	pushConstantUpdateQueue[imgIdentifier] = data;
 }
 

@@ -8,27 +8,26 @@
 
 const auto OBJECT_CLASS_SPATIAL = "Object_Spatial";
 
+const auto ATTRIBUTE_SPATIAL_POSITION_X = "SpatialPosX";
+const auto ATTRIBUTE_SPATIAL_POSITION_Y = "SpatialPosY";
+const auto ATTRIBUTE_SPATIAL_POSITION_Z = "SpatialPosZ";
+
+// object rotation about the x-axis
+const auto ATTRIBUTE_SPATIAL_ROTATE_NOD = "SpatialNod";
+// object rotation about the y-axis
+const auto ATTRIBUTE_SPATIAL_ROTATE_TURN = "SpatialTurn"; 
+// rotation about the vector resultant from the z-axis transformed by the previous two rotations
+const auto ATTRIBUTE_SPATIAL_ROTATE_TILT = "SpatialTilt"; 
+
+const auto ATTRIBUTE_SPATIAL_SCALE_X = "SpatialScaleX";
+const auto ATTRIBUTE_SPATIAL_SCALE_Y = "SpatialScaleY";
+const auto ATTRIBUTE_SPATIAL_SCALE_Z = "SpatialScaleZ";
+
+// perform parent transformations in addition to own, default=true
+const auto ATTRIBUTE_SPATIAL_PARENT_TRANSFORMATIONS_INHERIT = "InheritParentTransform";
 
 class Object_Spatial : public Object {
 	
-	// shortcut constants for getting and setting spatial attributes
-public:
-	const char* ATTRIBUTE_SPATIAL_POSITION_X = "SpatialPosX";
-	const char* ATTRIBUTE_SPATIAL_POSITION_Y = "SpatialPosY";
-	const char* ATTRIBUTE_SPATIAL_POSITION_Z = "SpatialPosZ";
-
-	const char* ATTRIBUTE_SPATIAL_FACING_X = "FacingX";
-	const char* ATTRIBUTE_SPATIAL_FACING_Y = "FacingY";
-	const char* ATTRIBUTE_SPATIAL_FACING_Z = "FacingZ";
-	const char* ATTRIBUTE_SPATIAL_FACING_ROTATION = "FacingRotation";
-
-	const char* ATTRIBUTE_SPATIAL_SCALE_X = "SpatialScaleX";
-	const char* ATTRIBUTE_SPATIAL_SCALE_Y = "SpatialScaleY";
-	const char* ATTRIBUTE_SPATIAL_SCALE_Z = "SpatialScaleZ";
-
-	const char* ATTRIBUTE_SPATIAL_PARENT_TRANSFORMATIONS_INHERIT = "InheritParentTransform";
-
-
 public:
 	Object_Spatial();
 	virtual ~Object_Spatial();

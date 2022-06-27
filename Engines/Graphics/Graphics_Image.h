@@ -25,7 +25,7 @@ private:
 
 	std::string graphicsPipeline;
 
-	std::vector<char> pushConstants;
+	std::vector<unsigned char> pushConstants;
 	uint32_t pushConstantsSizeBytes = 0;
 
 	VkDescriptorPool descriptorPool = nullptr;

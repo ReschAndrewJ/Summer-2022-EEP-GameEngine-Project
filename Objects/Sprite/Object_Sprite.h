@@ -9,21 +9,24 @@
 
 const auto OBJECT_CLASS_SPRITE = "Object_Sprite";
 
-class Object_Sprite : public Object_Spatial
-{
+// filepath to the image file from the application directory
+const auto ATTRIBUTE_SPRITE_IMG_FILEPATH = "SpriteFilepath";
+// width of the sprite, (not the image resolution width)
+const auto ATTRIBUTE_SPRITE_WIDTH = "SpriteWidth";
+// height of the sprite, (not the image resolution height)
+const auto ATTRIBUTE_SPRITE_HEIGHT = "SpriteHeight";
 
-	// shortcut constants for getting and setting Sprite attributes
-public:
-	const char* ATTRIBUTE_SPRITE_IMG_FILEPATH = "SpriteFilepath";
-	const char* ATTRIBUTE_SPRITE_WIDTH = "SpriteWidth";
-	const char* ATTRIBUTE_SPRITE_HEIGHT = "SpriteHeight";
+// set to false to not render the sprite
+const auto ATTRIBUTE_SPRITE_VISIBLE = "SpriteIsVisible";
 
-	const char* ATTRIBUTE_SPRITE_VISIBLE = "SpriteIsVisible";
-	// const char* ATTRIBUTE_SPRITE_OPACITY = "SpriteOpacity", 
-	// non-opaque objects would require an additional rendering sub-pass, 
-	// which is outside the scope of this project
+// not supported
+const auto ATTRIBUTE_SPRITE_OPACITY = "SpriteOpacity";
+// non-opaque objects would require an additional rendering sub-pass, 
+// which is outside the scope of this project
 
-	const char* ATTRIBUTE_SPRITE_IMG_IDENTIFIER = "SpriteImageIdentifier";
+const auto ATTRIBUTE_SPRITE_IMG_IDENTIFIER = "SpriteImageIdentifier";
+
+class Object_Sprite : public Object_Spatial {
 
 protected:
 	// <{owner object identifier, image identifier attribute name}, imageCreateInfo>
@@ -31,7 +34,7 @@ protected:
 	// <owner object identifier, image identifier attribute name>
 	std::set<std::pair<std::string, std::string>>* imageDestructionQueuePtr;
 	// <{owner object identifier, image identifier attribute name}, pushConstantsValues>
-	std::map<std::pair<std::string, std::string>, std::vector<char>>* pushConstantsUpdateQueuePtr;
+	std::map<std::pair<std::string, std::string>, std::vector<unsigned char>>* pushConstantsUpdateQueuePtr;
 
 
 public:

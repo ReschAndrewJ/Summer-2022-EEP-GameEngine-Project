@@ -482,11 +482,31 @@ Attribute& Attribute::operator=(const char* s) {
 	}
 }
 Attribute& Attribute::operator=(const Attribute& rAttr) {
-	if (val_type != types::EMPTY && val_type != rAttr.val_type) {
-		throw std::runtime_error("cannot assign non-empty attribute equal to attribute of differing type");
+	switch (rAttr.getType()) {
+	case types::EMPTY:
+		if (val_type != types::EMPTY) {
+			printf("cannot assign non-empty attribute equal to an empty attribute");
+		}
+		break;
+	case types::INTEGER:
+		*this = (long long)rAttr;
+		break;
+	case types::DOUBLE:
+		*this = (double)rAttr;
+		break;
+	case types::BOOLEAN:
+		*this = (bool)rAttr;
+		break;
+	case types::CHARACTER:
+		*this = (char)rAttr;
+		break;
+	case types::STRING:
+		*this = (std::string)rAttr;
+		break;
+	default:
+		printf("unhandled type for attribute assignment: %i", (int)rAttr.getType());
+		break;
 	}
-	val_type = rAttr.val_type;
-	value = rAttr.value;
 	return *this;
 }
 

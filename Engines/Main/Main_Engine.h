@@ -66,7 +66,7 @@ private:
 	// <owner object identifier, image identifier attribute name>
 	std::set<std::pair<std::string, std::string>> imageDestructionQueue;
 	// <{owner object identifier, image identifier attribute name}, pushConstantsValues>
-	std::map<std::pair<std::string, std::string>, std::vector<char>> pushConstantsUpdateQueue;
+	std::map<std::pair<std::string, std::string>, std::vector<unsigned char>> pushConstantsUpdateQueue;
 
 
 public:

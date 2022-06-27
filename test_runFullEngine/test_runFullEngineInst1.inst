@@ -2,44 +2,19 @@
 
 
 
-
-Object OrthoCamera Object_Camera
-
-Double SpatialPosX 0
-Double SpatialPosY 0 
-Double SpatialPosZ 0
-
-Double CameraWidth 256
-Double CameraHeight 256
-Double MinCameraDepth 0.1
-Double MaxCameraDepth 50
-
-Double FacingX 0
-Double FacingZ -1
-Double FacingRotation 0
-
-Boolean CameraOrthographic true
-
-Child Here testSprite1
-Child Here testSprite2
-Child Here testSprite3
-Child Here testSprite4
-
-
 Object PerspectiveCamera Object_Camera
 
 Double SpatialPosX 0
-Double SpatialPosY 60
+Double SpatialPosY 0
 Double SpatialPosZ 60
 
 Double MinCameraDepth 0.1
 Double MaxCameraDepth 500
 
-Double FacingY -1
-Double FacingZ -1
-Double FacingRotation 0
+Double SpatialNod 0
+Double SpatialTurn 0
+Double SpatialTilt 0
 
-Boolean CameraOrthographic false
 Double CameraFOV 90
 
 
@@ -47,6 +22,7 @@ Child Here testSprite1
 Child Here testSprite2
 Child Here testSprite3
 Child Here testSprite4
+Child Here testText
 
 
 Object testSprite1 Object_Sprite
@@ -87,7 +63,6 @@ Double SpatialPosZ -15
 Integer SpriteWidth 48
 Integer SpriteHeight 48
 
-Double FacingRotation 45
 
 String SpriteFilepath "./test_runFullEngine/test_img3.png"
 
@@ -101,10 +76,22 @@ Double SpatialPosZ -30
 Integer SpriteWidth 32
 Integer SpriteHeight 32
 
-Double FacingRotation 0
 
-Double FacingX 0
-Double FacingZ -1
+Double SpatialNod 0
+Double SpatialTurn 0
+Double SpatialTilt 0
+
 
 String SpriteFilepath "./test_runFullEngine/test_img4.jpg"
 
+
+Object testText Object_Text
+
+String SpriteFilepath "C:/Windows/Fonts/comicbd.ttf"
+
+String TextString "Hello  World"
+Integer TextRowLen 6
+Integer TextRowCount 2
+
+Integer SpriteWidth 48
+Integer SpriteHeight 48

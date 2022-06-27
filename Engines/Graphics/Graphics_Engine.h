@@ -35,7 +35,7 @@ public:
 private:
 	std::unordered_map<std::string, image_create_info> imageCreateQueue{}; // sets and maps to detect duplicate entries
 	std::unordered_set<std::string> imageDestroyQueue{};
-	std::unordered_map<std::string, std::vector<char>> pushConstantUpdateQueue{};
+	std::unordered_map<std::string, std::vector<unsigned char>> pushConstantUpdateQueue{};
 
 private:
 	std::unordered_map<std::string, Graphics_Image> images{};
@@ -99,8 +99,8 @@ public:
 	// adds an image identifier to the destroy queue
 	void queueDestroyImage(std::string);
 	/* queues an image's push constants to be updated
-	queuePushConstantsUpdate(std::string imageIdentifier, vector<char>& data) */
-	void queuePushConstantsUpdate(std::string, std::vector<char>&);
+	queuePushConstantsUpdate(std::string imageIdentifier, vector<unsigned char>& data) */
+	void queuePushConstantsUpdate(std::string, std::vector<unsigned char>&);
 
 
 public:

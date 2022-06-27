@@ -13,11 +13,11 @@ struct image_create_info {
 	std::string fragShaderPath;
 
 	uint32_t pushConstantsSizeBytes = 0;
-	std::vector<char> initalPushConstantsValues;
+	std::vector<unsigned char> initalPushConstantsValues;
 
 	unsigned int texture_rows = 0;
 	unsigned int texture_columns = 0;
-	std::vector<char> pixels;
+	std::vector<unsigned char> pixels;
 };
 
 #endif //IMAGE_CREATE_INFO

@@ -9,6 +9,7 @@
 #include "../Objects/Sprite/Object_Sprite.h"
 #include "../Objects/Camera/Object_Camera.h"
 #include "../Objects/Collision/Object_Collision.h"
+#include "../Objects/Text/Object_Text.h"
 
 
 #else
@@ -22,9 +23,9 @@ std::pair<Object*, std::vector<std::pair<std::string, std::string>>> Object_Load
 		loadDataFromInstFile(filepath);
 	}
 	if (!loadedObjectInfos.count({ filepath + '/' + identifier})) {
-		std::string err = "No instance data: " + filepath + '/' + identifier;
+		std::string err = "No instance data: " + filepath + '/' + identifier + "\n";
 		printf(err.c_str());
-		throw std::runtime_error(err);
+		return { new Object(),{} };
 	}
 	
 	std::pair<Object*, std::vector<std::pair<std::string, std::string>>> returnData;
@@ -39,6 +40,7 @@ std::pair<Object*, std::vector<std::pair<std::string, std::string>>> Object_Load
 	else if (ObjectInfo.class_identifier == OBJECT_CLASS_SPRITE) newObject = new Object_Sprite();
 	else if (ObjectInfo.class_identifier == OBJECT_CLASS_CAMERA) newObject = new Object_Camera();
 	else if (ObjectInfo.class_identifier == OBJECT_CLASS_COLLISION) newObject = new Object_Collision();
+	else if (ObjectInfo.class_identifier == OBJECT_CLASS_TEXT) newObject = new Object_Text();
 
 
 #else
@@ -46,9 +48,9 @@ std::pair<Object*, std::vector<std::pair<std::string, std::string>>> Object_Load
 #endif
 	//
 	if (newObject == nullptr) {
-		std::string err = "attempted to load object with unmanaged object class: " + ObjectInfo.class_identifier;
+		std::string err = "attempted to load object with unmanaged object class: " + ObjectInfo.class_identifier + "\n";
 		printf(err.c_str());
-		throw std::runtime_error(err);
+		return { new Object(), {}};
 	}
 
 	for (const auto& attr : ObjectInfo.attributes) {
@@ -67,9 +69,9 @@ void Object_Loader::loadDataFromInstFile(std::string filepath) {
 	std::fstream fileStream;
 	fileStream.open(filepath);
 	if (!fileStream.is_open()) {
-		std::string err = "failed to open file: " + filepath;
+		std::string err = "failed to open file: " + filepath + "\n";
 		printf(err.c_str());
-		throw std::runtime_error(err);
+		return;
 	}
 
 	Object_Info currentInfo;
@@ -301,9 +303,9 @@ void Object_Loader::loadDataFromInstFile(std::string filepath) {
 			if (val_as_string == "true") attr_val = true;
 			else if (val_as_string == "false") attr_val = false;
 			else {
-			std::string err = "invalid value in inst file: " + filepath + " for boolean attribute: " + attr_name;
+			std::string err = "invalid value in inst file: " + filepath + " for boolean attribute: " + attr_name + "\n";
 			printf(err.c_str());
-				throw std::runtime_error(err);
+			continue;
 			}
 
 			currentInfo.attributes.push_back({ attr_name, attr_val });
@@ -384,9 +386,9 @@ void Object_Loader::loadDataFromInstFile(std::string filepath) {
 			continue;
 		} // String
 
-		std::string err = "invalid line number " + std::to_string(lineNumber) + ": " + line;
+		std::string err = "invalid line " + std::to_string(lineNumber) + ": " + line + "\n";
 		printf(err.c_str());
-		throw std::runtime_error(err);
+		continue;
 	}
 	loadedObjectInfos.insert({ filepath + '/' + currentInfo.name_id, currentInfo });
 

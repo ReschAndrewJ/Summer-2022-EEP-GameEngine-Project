@@ -123,6 +123,7 @@ void Main_Engine::objectLoop() {
 
 		auto time = std::chrono::steady_clock::now();
 		delta = std::chrono::duration<float>(time - endOfLastFrame).count();
+		endOfLastFrame = time;
 
 		// tell the secondary thread that delta has been updated
 		deltaUpdateSemaphore.arriveAtSemaphore();
