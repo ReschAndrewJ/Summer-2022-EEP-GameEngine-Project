@@ -23,6 +23,7 @@ Child Here testSprite2
 Child Here testSprite3
 Child Here testSprite4
 Child Here testText
+Child Here testAnimatedSprite
 
 
 Object testSprite1 Object_Sprite
@@ -93,5 +94,30 @@ String TextString "Hello  World"
 Integer TextRowLen 6
 Integer TextRowCount 2
 
+Integer TextCount -1
+
 Integer SpriteWidth 48
 Integer SpriteHeight 48
+
+
+Object testAnimatedSprite Object_AnimatedSprite
+
+String SpriteFilepath "./test_runFullEngine/test_spritesheet1.png"
+
+Integer AnimatedSpriteRowCnt 2
+Integer AnimatedSpriteColCnt 2
+
+Integer AnimatedSpriteFirstIndex 0
+Integer AnimatedSpriteLastIndex 3
+
+Double AnimatedSpriteDelay 0.2
+
+Boolean AnimatedSpriteIsPlaying true
+Boolean AnimatedSpriteDoesLoop true
+
+Integer SpriteWidth 32
+Integer SpriteHeight 32
+
+Double SpatialPosX -64
+Double SpatialPosY 32
+

@@ -59,7 +59,7 @@ void Object_Sprite::loadImage() {
 	if (!pixels) {
 		std::string err = "failed to load image pixels from file: " + (std::string)getAttribute(ATTRIBUTE_SPRITE_IMG_FILEPATH);
 		printf(err.c_str());
-		throw std::runtime_error(err);
+		return;
 	}
 	imgInfo.pixels.resize((size_t)texWidth * texHeight * 4);
 	for (size_t i = 0; i < (size_t)texWidth * texHeight * 4; ++i) {

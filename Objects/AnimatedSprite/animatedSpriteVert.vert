@@ -5,30 +5,17 @@ vec2 vertices[4] = vec2[](
 	vec2(-1.0, 1.0), vec2(1.0, 1.0)
 );
 
-vec2 texture_coordinates[4] = vec2[](
-	vec2(0,0), vec2(1,0),
-	vec2(0,1), vec2(1,1)
-);
-
 layout (push_constant) uniform pushConstants_block {
 	mat4 transformation_matrix;
-	float boundX;
-	float boundYInner;
-	float boundYOuter;
+	vec2 cell_bounds[4];
 	int is_visible;
 } pushConstants;
 
 layout (location = 0) out vec2 fragTexCoord;
 layout (location = 1) out int is_visible;
-layout (location = 2) out float boundX;
-layout (location = 3) out float boundYInner;
-layout (location = 4) out float boundYOuter;
 
 void main() {
 	gl_Position = pushConstants.transformation_matrix * vec4(vertices[gl_VertexIndex], 0.0, 1.0);
-	fragTexCoord = texture_coordinates[gl_VertexIndex];
+	fragTexCoord = pushConstants.cell_bounds[gl_VertexIndex];
 	is_visible = pushConstants.is_visible;
-	boundX = pushConstants.boundX;
-	boundYInner = pushConstants.boundYInner;
-	boundYOuter = pushConstants.boundYOuter;
 }

@@ -5,7 +5,6 @@
 #include "../Spatial/Object_Spatial.h"
 
 
-
 const auto OBJECT_CLASS_COLLISION = "Object_Collision";
 
 // the explicit dimensions of the collision object, are influenced by SpatialScale
@@ -21,8 +20,12 @@ const auto ATTRIBUTE_COLLIDER_IGNORE_Z = "ColliderIgnoreZ";
 const auto ATTRIBUTE_COLLIDER_IGNORE_Y = "ColliderIgnoreY";
 const auto ATTRIBUTE_COLLIDER_IGNORE_X = "ColliderIgnoreX";
 
-class Object_Collision : public Object_Spatial {
+// a non-detectable collision object will be excluded from the collision tests of 
+// other collision objects
 
+const auto ATTRIBUTE_COLLIDER_DETECTABLE = "ColliderDetectable";
+
+class Object_Collision : public Object_Spatial {
 protected:
 	std::unordered_map<std::string, Object*>* objectContainerPtr;
 

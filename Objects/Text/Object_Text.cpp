@@ -88,7 +88,12 @@ void Object_Text::loadImage() {
 					pixelColumnsInTextRow[col + prevWidth][row + verticalStartOffset] = charImg.first[row * charWidth + col];
 				}
 			}
-
+			xBounds.push_back(newWidth);
+		}
+		size_t newLast = yBounds.size();
+		yBounds.push_back({ 0, pixelColumnsInTextRow.size() != 0 ? pixelColumnsInTextRow[0].size() : 0 });
+		if (newLast > 0) {
+			yBounds[newLast].first = yBounds[newLast - 1].first + yBounds[newLast - 1].second;
 		}
 
 		// copy pixel data from pixelColumns to characterImgRows
@@ -117,6 +122,13 @@ void Object_Text::loadImage() {
 		}
 	}
 
+	for (float& bound : xBounds) {
+		bound = bound / maxWidth;
+	}
+	for (auto& bound : yBounds) {
+		bound.first = bound.first / (pixels.size() / maxWidth);
+		bound.second = bound.second / (pixels.size() / maxWidth);
+	}
 	
 	/* DOES NOT APPLY VERTICAL PADDING
 	std::vector<std::vector<unsigned char>> RowsTopToBottom(1);
@@ -197,17 +209,26 @@ void Object_Text::loadImage() {
 	initPushConstants.transformationMatrix = glm::mat4(1.0f);
 
 	long long count = getAttribute(ATTRIBUTE_TEXT_DISPLAY_COUNT);
+	if (count > text.size()) {
+		count = text.size();
+		setAttribute(ATTRIBUTE_TEXT_DISPLAY_COUNT, count);
+	}
 	if (count == -1) {
 		initPushConstants.boundX = 1;
 		initPushConstants.boundYInner = 1;
 		initPushConstants.boundYOuter = 1;
 	}
+	else if (count == 0) {
+		initPushConstants.boundX = 0;
+		initPushConstants.boundYInner = 0;
+		initPushConstants.boundYOuter = 0;
+	}
 	else {
-		int boundCol = count % charCols;
-		initPushConstants.boundX = (float)boundCol / charCols;
-		int boundRow = count / charCols;
-		initPushConstants.boundYInner = (float)boundRow / charRows;
-		initPushConstants.boundYOuter = initPushConstants.boundYInner + (1.0f / charRows);
+		int boundCol = (count - 1);
+		initPushConstants.boundX = xBounds[boundCol];
+		int boundRow = (count-1) / charCols;
+		initPushConstants.boundYInner = yBounds[boundRow].first;
+		initPushConstants.boundYOuter = initPushConstants.boundYInner + yBounds[boundRow].second;
 	}
 
 	imgInfo.pushConstantsSizeBytes = sizeof(txtPush_struct);
@@ -241,10 +262,19 @@ void Object_Text::updatePushConstants() {
 	pushValues.transformationMatrix = cameraMat * getTransformationMatrix(scaleMat);
 	
 	long long count = getAttribute(ATTRIBUTE_TEXT_DISPLAY_COUNT);
+	if (count > ((std::string)getAttribute(ATTRIBUTE_TEXT_STRING)).size()) {
+		count = ((std::string)getAttribute(ATTRIBUTE_TEXT_STRING)).size();
+		setAttribute(ATTRIBUTE_TEXT_DISPLAY_COUNT, count);
+	}
 	if (count == -1) {
 		pushValues.boundX = 1;
 		pushValues.boundYInner = 1;
 		pushValues.boundYOuter = 1;
+	}
+	else if (count == 0) {
+		pushValues.boundX = 0;
+		pushValues.boundYInner = 0;
+		pushValues.boundYOuter = 0;
 	}
 	else {
 		int cols = getAttribute(ATTRIBUTE_TEXT_ROW_LENGTH);
@@ -253,11 +283,11 @@ void Object_Text::updatePushConstants() {
 			cols = ((std::string)getAttribute(ATTRIBUTE_TEXT_STRING)).size();
 			rows = 1;
 		}
-		int boundCol = count % cols;
-		pushValues.boundX = (float)boundCol / cols;
-		int boundRow = count / cols;
-		pushValues.boundYInner = (float)boundRow / rows;
-		pushValues.boundYOuter = pushValues.boundYInner + (1.0f / rows);
+		int boundCol = (count - 1);
+		pushValues.boundX = xBounds[boundCol];
+		int boundRow = (count-1) / cols;
+		pushValues.boundYInner = yBounds[boundRow].first;
+		pushValues.boundYOuter = pushValues.boundYInner + yBounds[boundRow].second;
 	}
 
 	std::vector<unsigned char> pushValuesV(sizeof(txtPush_struct));

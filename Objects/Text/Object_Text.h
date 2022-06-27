@@ -29,6 +29,11 @@ protected:
 	void updatePushConstants() override;
 
 
+	// helper variables, not permanent attributes
+private:
+	std::vector<float> xBounds; // per character
+	std::vector<std::pair<float, float>> yBounds; // per row, <start,height>
+
 
 };
 

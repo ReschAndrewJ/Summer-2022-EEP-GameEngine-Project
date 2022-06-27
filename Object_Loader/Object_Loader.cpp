@@ -10,7 +10,8 @@
 #include "../Objects/Camera/Object_Camera.h"
 #include "../Objects/Collision/Object_Collision.h"
 #include "../Objects/Text/Object_Text.h"
-
+#include "../Objects/ActiveCollision/Object_ActiveCollision.h"
+#include "../Objects/AnimatedSprite/Object_AnimatedSprite.h"
 
 #else
 #include "../Objects/Test/Object_Test1.h"
@@ -41,6 +42,8 @@ std::pair<Object*, std::vector<std::pair<std::string, std::string>>> Object_Load
 	else if (ObjectInfo.class_identifier == OBJECT_CLASS_CAMERA) newObject = new Object_Camera();
 	else if (ObjectInfo.class_identifier == OBJECT_CLASS_COLLISION) newObject = new Object_Collision();
 	else if (ObjectInfo.class_identifier == OBJECT_CLASS_TEXT) newObject = new Object_Text();
+	else if (ObjectInfo.class_identifier == OBJECT_CLASS_ACTIVECOLLISION) newObject = new Object_ActiveCollision();
+	else if (ObjectInfo.class_identifier == OBJECT_CLASS_ANIMATEDSPRITE) newObject = new Object_AnimatedSprite();
 
 
 #else

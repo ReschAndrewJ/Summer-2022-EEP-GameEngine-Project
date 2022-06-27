@@ -861,8 +861,11 @@ void Graphics_Engine::createGraphicsPipeline(Graphics_Image& buildImage) {
 	
 	std::ifstream vertFile;
 	vertFile.open(buildImage.vertShaderPath, std::ios::ate | std::ios::binary);
-	if (!vertFile.is_open()) throw std::runtime_error("failed to open vertex shader file: " + buildImage.vertShaderPath);
-
+	if (!vertFile.is_open()) {
+		std::string err = "failed to open vertex shader file: " + buildImage.vertShaderPath + "\n";
+		printf(err.c_str());
+		return;
+	}
 	size_t filesize = (size_t)vertFile.tellg();
 	std::vector<char> buffer(filesize);
 
@@ -1522,7 +1525,7 @@ void Graphics_Engine::recordDrawCommandBuffer(uint32_t swapImageIndex) {
 			vkCmdPushConstants(drawCommandBuffers[currentFrame], pipelines[boundPipeline].second,
 				VK_SHADER_STAGE_VERTEX_BIT, 0, image.second.pushConstantsSizeBytes, image.second.pushConstants.data());
 		}
-		vkCmdDraw(drawCommandBuffers[currentFrame], 6, 1, 0, 0); // 6 vertices for a square
+		vkCmdDraw(drawCommandBuffers[currentFrame], 4, 1, 0, 0); // 4 vertices with VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP
 	}
 	vkCmdEndRenderPass(drawCommandBuffers[currentFrame]);
 
