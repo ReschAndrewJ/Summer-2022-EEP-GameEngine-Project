@@ -616,6 +616,7 @@ namespace UnitTests
 		TEST_METHOD(LoadSingle) {
 			std::string filepath = "testInst1.inst";
 			Object_Loader testLoader;
+			testLoader.setupBuiltInClasses();
 			Object* test_obj = testLoader.createInstance(filepath, "test_one").first;
 			delete test_obj;
 			Assert::AreEqual((size_t)1, testLoader.loadedObjectInfos.size());
@@ -626,6 +627,7 @@ namespace UnitTests
 		TEST_METHOD(LoadSingle_values) {
 			std::string filepath = "testInst1.inst";
 			Object_Loader testLoader;
+			testLoader.setupBuiltInClasses();
 			Object* test_obj = testLoader.createInstance(filepath, "test_one").first;
 			Assert::AreEqual(2556, (int)test_obj->getAttribute("intA"));
 			Assert::AreEqual(3.14, (double)test_obj->getAttribute("doubleA"));
@@ -639,6 +641,7 @@ namespace UnitTests
 		TEST_METHOD(LoadMultiple) {
 			std::string filepath = "testInst2.inst";
 			Object_Loader testLoader;
+			testLoader.setupBuiltInClasses();
 			auto test_obj1 = testLoader.createInstance(filepath, "test_one");
 			auto test_obj2 = testLoader.createInstance(test_obj1.second[0].first, test_obj1.second[0].second);
 			auto test_obj3 = testLoader.createInstance(test_obj2.second[0].first, test_obj2.second[0].second);
@@ -656,6 +659,7 @@ namespace UnitTests
 		TEST_METHOD(LoadMultiple_values) {
 			std::string filepath = "testInst2.inst";
 			Object_Loader testLoader;
+			testLoader.setupBuiltInClasses();
 			auto test_obj1 = testLoader.createInstance(filepath, "test_one");
 			auto test_obj2 = testLoader.createInstance(test_obj1.second[0].first, test_obj1.second[0].second);
 			auto test_obj3 = testLoader.createInstance(test_obj2.second[0].first, test_obj2.second[0].second);
@@ -713,6 +717,7 @@ namespace UnitTests
 				auto start = std::chrono::steady_clock::now();
 
 				Object_Loader testLoader;
+				testLoader.setupBuiltInClasses();
 				auto test_obj = testLoader.createInstance("test_file1.inst", "test_object1");
 				delete test_obj.first;
 

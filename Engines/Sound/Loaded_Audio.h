@@ -5,8 +5,6 @@
 
 #include "SFML/Audio.hpp"
 
-const auto AUDIO_TYPE_LOADED = "AUDIO_TYPE_LOADED";
-
 class Loaded_Audio : public Audio {
 
 private:
@@ -27,6 +25,8 @@ public:
 	void setVolume(float) override;
 	float getVolume() override;
 
+	void setPlayingOffset(float) override;
+	float getPlayingOffset() override;
 
 };
 

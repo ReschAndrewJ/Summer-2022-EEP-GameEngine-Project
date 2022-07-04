@@ -6,7 +6,7 @@
 const auto OBJECT_CLASS_TEST1 = "Object_Test1";
 
 #include "../Base/Object.h"
-class Object_Test1 : public Object
+class Object_Test1 : virtual public Object
 {
 public:
 	Object_Test1();

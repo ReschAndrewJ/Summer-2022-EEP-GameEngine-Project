@@ -11,9 +11,10 @@ Sound_Engine::~Sound_Engine() {
 
 
 void Sound_Engine::clearEngine() {
-	for (unsigned i = 0; i < maxSoundCount; ++i) {
-		if (sounds[i] != nullptr) delete sounds[i];
+	for (auto & item : audioContainer) {
+		if (item.second != nullptr) delete item.second;
 	}
+	audioContainer.clear();
 }
 
 
@@ -26,15 +27,13 @@ float Sound_Engine::getGlobalVolume() {
 }
 
 
-int Sound_Engine::addAudio(std::string filepath, std::string audioType) {
-	unsigned index = -1;
-	for (unsigned i = 0; i < maxSoundCount; ++i) {
-		if (sounds[i] == nullptr) {
-			index = i;
-			break;
-		}
+bool Sound_Engine::loadAudio(std::string filepath, std::string audioIdentifier, std::string audioType) {
+	if (audioContainer.size() > maxSoundCount) {
+		std::string err = "out of audio space, max sound count: " + std::to_string(maxSoundCount) + "\n";
+		printf(err.c_str());
+		return false;
 	}
-	if (index == -1) return -1;
+	if (audioContainer.count(audioIdentifier)) return true;
 
 	Audio* sound;
 	if (audioType == AUDIO_TYPE_LOADED) sound = new Loaded_Audio();
@@ -42,50 +41,74 @@ int Sound_Engine::addAudio(std::string filepath, std::string audioType) {
 	else {
 		std::string err = "invalid audio type: " + audioType;
 		printf(err.c_str());
-		return -1;
+		return false;
 	}
 
 	if (!sound->load(filepath)) {
 		std::string err = "failed to load audio file: " + filepath;
 		printf(err.c_str());
 		delete sound;
-		return -1;
+		return false;
 	}
-	return index;
+
+	audioContainer.insert({ audioIdentifier, sound });
+	return true;
 }
 
 
-void Sound_Engine::removeAudio(int index) {
-	if (index < 0 || index >= maxSoundCount) return;
-	if (sounds[index] != nullptr) delete sounds[index];
+void Sound_Engine::removeAudio(std::string audioIdentifier) {
+	if (audioContainer.count(audioIdentifier)) {
+		delete audioContainer.at(audioIdentifier); 
+		audioContainer.erase(audioIdentifier);
+	}
 }
 
 
-void Sound_Engine::playAudio(int index) {
-	if (index < 0 || index >= maxSoundCount) return;
-	if (sounds[index] != nullptr) sounds[index]->play();
+bool Sound_Engine::playAudio(std::string audioIdentifier) {
+	if (!audioContainer.count(audioIdentifier)) {
+		std::string err = "audio not loaded, audio: " + audioIdentifier + "\n";
+		printf(err.c_str());
+		return false;
+	}
+	audioContainer.at(audioIdentifier)->play();
+	if (!audioContainer.at(audioIdentifier)->isPlaying()) {
+		std::string err = "audio mapped to container but failed to play, audio: " + audioIdentifier + "\n";
+		printf(err.c_str());
+		return false;
+	}
+	return true;
 }
 
 
-void Sound_Engine::stopAudio(int index) {
-	if (index < 0 || index >= maxSoundCount) return;
-	if (sounds[index] != nullptr) sounds[index]->stop();
+void Sound_Engine::stopAudio(std::string audioIdentifier) {
+	if (!audioContainer.count(audioIdentifier)) return;
+	audioContainer.at(audioIdentifier)->stop();
 }
 
 
-void Sound_Engine::pauseAudio(int index) {
-	if (index < 0 || index >= maxSoundCount) return;
-	if (sounds[index] != nullptr) sounds[index]->pause();
+void Sound_Engine::pauseAudio(std::string audioIdentifier) {
+	if (!audioContainer.count(audioIdentifier)) return;
+	audioContainer.at(audioIdentifier)->pause();
 }
 
 
-void Sound_Engine::setAudioVolume(int index, float volume) {
-	if (index < 0 || index >= maxSoundCount) return;
-	if (sounds[index] != nullptr) sounds[index]->setVolume(volume);
+void Sound_Engine::setAudioVolume(std::string audioIdentifier, float volume) {
+	if (!audioContainer.count(audioIdentifier)) return;
+	audioContainer.at(audioIdentifier)->setVolume(volume);
 }
 
 
-float Sound_Engine::getAudioVolume(int index) {
-	if (index < 0 || index >= maxSoundCount) return -1;
-	return sounds[index] != nullptr ? sounds[index]->getVolume() : -1;
+float Sound_Engine::getAudioVolume(std::string audioIdentifier) {
+	if (!audioContainer.count(audioIdentifier)) return -1;
+	return audioContainer.at(audioIdentifier)->getVolume();
+}
+
+
+void Sound_Engine::setAudioOffset(std::string audioIdentifier, float offset) {
+	if (audioContainer.count(audioIdentifier)) audioContainer.at(audioIdentifier)->setPlayingOffset(offset);
+}
+
+float Sound_Engine::getAudioOffset(std::string audioIdentifier) {
+	if (!audioContainer.count(audioIdentifier)) return -1;
+	return audioContainer.at(audioIdentifier)->getPlayingOffset();
 }

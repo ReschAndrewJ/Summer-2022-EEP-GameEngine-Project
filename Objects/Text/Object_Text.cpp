@@ -33,26 +33,26 @@ void Object_Text::loadImage() {
 
 	std::string text = getAttribute(ATTRIBUTE_TEXT_STRING);
 	std::string font = getAttribute(ATTRIBUTE_TEXT_FONT);
-	long long charRows = getAttribute(ATTRIBUTE_TEXT_ROW_COUNT);
-	long long charCols = getAttribute(ATTRIBUTE_TEXT_ROW_LENGTH);
+	size_t charRows = (long long)getAttribute(ATTRIBUTE_TEXT_ROW_COUNT);
+	size_t charCols = (long long)getAttribute(ATTRIBUTE_TEXT_ROW_LENGTH);
 	if (charCols == -1) {
 		charCols = text.size();
 		charRows = 1;
 	}
-	
+
 	// construct image from string and font
 	std::vector<std::vector<std::deque<unsigned char>>> characterImgRows;
 	for (size_t row = 0; row < charRows; ++row) {
 		std::vector<std::deque<unsigned char>> pixelColumnsInTextRow;
 
-		int baseline = 0;
+		size_t baseline = 0;
 
 		for (size_t column = 0; column < charCols; ++column) {
 			auto charImg = FontManager::getCharacterImage(font, text[row * charCols + column]);
 			
-			int charWidth = abs(charImg.second.first);
-			int distAboveBaseline = charImg.second.second;
-			int distBelowBaseline = charImg.first.size() / charWidth - distAboveBaseline;
+			size_t charWidth = abs(charImg.second.first);
+			size_t distAboveBaseline = charImg.second.second;
+			size_t distBelowBaseline = charImg.first.size() / charWidth - distAboveBaseline;
 
 			// resize pixelColumns vector
 			size_t prevWidth = pixelColumnsInTextRow.size();
@@ -63,7 +63,7 @@ void Object_Text::loadImage() {
 				pixelColumnsInTextRow[i].resize(prevHeight);
 			}
 			if (distAboveBaseline > baseline) { // add space above
-				int diff = distAboveBaseline - baseline;
+				size_t diff = distAboveBaseline - baseline;
 				for (size_t i = 0; i < newWidth; ++i) {
 					for (size_t j = 0; j < diff; ++j) {
 						pixelColumnsInTextRow[i].push_front(0);
@@ -72,26 +72,26 @@ void Object_Text::loadImage() {
 				baseline = distAboveBaseline;
 			}
 			if (distBelowBaseline > pixelColumnsInTextRow[0].size() - baseline) { // add space below
-				int diff = distBelowBaseline - (pixelColumnsInTextRow[0].size() - baseline);
+				size_t diff = distBelowBaseline - (pixelColumnsInTextRow[0].size() - baseline);
 				for (size_t i = 0; i < newWidth; ++i) {
 					for (size_t j = 0; j < diff; ++j) {
 						pixelColumnsInTextRow[i].push_back(0);
 					}
 				}
 			}
-			int newHeight = pixelColumnsInTextRow[0].size();
+			size_t newHeight = pixelColumnsInTextRow[0].size();
 
 			// copy pixel data to pixelColumns vector
-			int verticalStartOffset = baseline - distAboveBaseline;
+			size_t verticalStartOffset = baseline - distAboveBaseline;
 			for (size_t col = 0; col < charWidth; ++col) {
 				for (size_t row = 0; row < (size_t)distAboveBaseline + distBelowBaseline; ++row) {
 					pixelColumnsInTextRow[col + prevWidth][row + verticalStartOffset] = charImg.first[row * charWidth + col];
 				}
 			}
-			xBounds.push_back(newWidth);
+			xBounds.push_back((float)newWidth);
 		}
 		size_t newLast = yBounds.size();
-		yBounds.push_back({ 0, pixelColumnsInTextRow.size() != 0 ? pixelColumnsInTextRow[0].size() : 0 });
+		yBounds.push_back({ 0.0f, pixelColumnsInTextRow.size() != 0 ? (float)pixelColumnsInTextRow[0].size() : 0.0f });
 		if (newLast > 0) {
 			yBounds[newLast].first = yBounds[newLast - 1].first + yBounds[newLast - 1].second;
 		}
@@ -126,8 +126,8 @@ void Object_Text::loadImage() {
 		bound = bound / maxWidth;
 	}
 	for (auto& bound : yBounds) {
-		bound.first = bound.first / (pixels.size() / maxWidth);
-		bound.second = bound.second / (pixels.size() / maxWidth);
+		bound.first = bound.first / (float)(pixels.size() / maxWidth);
+		bound.second = bound.second / (float)(pixels.size() / maxWidth);
 	}
 	
 	/* DOES NOT APPLY VERTICAL PADDING
@@ -185,13 +185,13 @@ void Object_Text::loadImage() {
 
 	image_create_info imgInfo;
 
-	imgInfo.vertShaderPath = "Objects/Text/textVert.spv";
-	imgInfo.fragShaderPath = "Objects/Text/textFrag.spv";
+	imgInfo.vertShaderPath = "Resources/Shaders/textVert.spv";
+	imgInfo.fragShaderPath = "Resources/Shaders/textFrag.spv";
 	imgInfo.identifier = getIdentifier();
 	imgInfo.graphicsPipeline = "Text_Pipeline";
 
-	imgInfo.texture_columns = maxWidth / 4;
-	imgInfo.texture_rows = pixels.size() / maxWidth;
+	imgInfo.texture_columns = (uint32_t)(maxWidth / 4);
+	imgInfo.texture_rows = (uint32_t)(pixels.size() / maxWidth);
 
 	if (pixels.size() == 0) {
 		std::string err = "failed to load text to pixels, text: " + (std::string)getAttribute(ATTRIBUTE_TEXT_STRING) + "\n" +
@@ -208,10 +208,10 @@ void Object_Text::loadImage() {
 	initPushConstants.isVisible = 0;
 	initPushConstants.transformationMatrix = glm::mat4(1.0f);
 
-	long long count = getAttribute(ATTRIBUTE_TEXT_DISPLAY_COUNT);
+	size_t count = (long long)getAttribute(ATTRIBUTE_TEXT_DISPLAY_COUNT);
 	if (count > text.size()) {
 		count = text.size();
-		setAttribute(ATTRIBUTE_TEXT_DISPLAY_COUNT, count);
+		setAttribute(ATTRIBUTE_TEXT_DISPLAY_COUNT, (long long)count);
 	}
 	if (count == -1) {
 		initPushConstants.boundX = 1;
@@ -224,9 +224,9 @@ void Object_Text::loadImage() {
 		initPushConstants.boundYOuter = 0;
 	}
 	else {
-		int boundCol = (count - 1);
+		size_t boundCol = (count - 1);
 		initPushConstants.boundX = xBounds[boundCol];
-		int boundRow = (count-1) / charCols;
+		size_t boundRow = (count-1) / charCols;
 		initPushConstants.boundYInner = yBounds[boundRow].first;
 		initPushConstants.boundYOuter = initPushConstants.boundYInner + yBounds[boundRow].second;
 	}
@@ -253,7 +253,7 @@ void Object_Text::updatePushConstants() {
 		while (parent != "ROOT") {
 			auto obj = getObject(parent);
 			if (obj->is_class(OBJECT_CLASS_CAMERA)) {
-				cameraMat = ((Object_Camera*)obj)->getCameraTransformationMatrix();
+				cameraMat = dynamic_cast<Object_Camera*>(obj)->getCameraTransformationMatrix();
 				break;
 			}
 			parent = obj->getParentIdentifier();
@@ -261,10 +261,10 @@ void Object_Text::updatePushConstants() {
 	}
 	pushValues.transformationMatrix = cameraMat * getTransformationMatrix(scaleMat);
 	
-	long long count = getAttribute(ATTRIBUTE_TEXT_DISPLAY_COUNT);
+	size_t count = (long long)getAttribute(ATTRIBUTE_TEXT_DISPLAY_COUNT);
 	if (count > ((std::string)getAttribute(ATTRIBUTE_TEXT_STRING)).size()) {
 		count = ((std::string)getAttribute(ATTRIBUTE_TEXT_STRING)).size();
-		setAttribute(ATTRIBUTE_TEXT_DISPLAY_COUNT, count);
+		setAttribute(ATTRIBUTE_TEXT_DISPLAY_COUNT, (long long)count);
 	}
 	if (count == -1) {
 		pushValues.boundX = 1;
@@ -277,15 +277,15 @@ void Object_Text::updatePushConstants() {
 		pushValues.boundYOuter = 0;
 	}
 	else {
-		int cols = getAttribute(ATTRIBUTE_TEXT_ROW_LENGTH);
-		int rows = getAttribute(ATTRIBUTE_TEXT_ROW_COUNT);
+		size_t cols = (long long)getAttribute(ATTRIBUTE_TEXT_ROW_LENGTH);
+		size_t rows = (long long)getAttribute(ATTRIBUTE_TEXT_ROW_COUNT);
 		if (cols == -1) {
 			cols = ((std::string)getAttribute(ATTRIBUTE_TEXT_STRING)).size();
 			rows = 1;
 		}
-		int boundCol = (count - 1);
+		size_t boundCol = (count - 1);
 		pushValues.boundX = xBounds[boundCol];
-		int boundRow = (count-1) / cols;
+		size_t boundRow = (count-1) / cols;
 		pushValues.boundYInner = yBounds[boundRow].first;
 		pushValues.boundYOuter = pushValues.boundYInner + yBounds[boundRow].second;
 	}

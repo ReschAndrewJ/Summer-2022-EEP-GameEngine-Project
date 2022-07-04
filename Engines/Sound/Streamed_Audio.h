@@ -5,7 +5,6 @@
 
 #include "SFML/Audio.hpp"
 
-const auto AUDIO_TYPE_STREAMED = "AUDIO_TYPE_STREAMED";
 
 class Streamed_Audio : public Audio {
 
@@ -26,6 +25,8 @@ public:
 	void setVolume(float) override;
 	float getVolume() override;
 
+	void setPlayingOffset(float) override;
+	float getPlayingOffset() override;
 
 };
 

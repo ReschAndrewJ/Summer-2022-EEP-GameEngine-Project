@@ -23,6 +23,9 @@ public:
 	virtual void setVolume(float) = 0;
 	virtual float getVolume() = 0;
 
+	virtual void setPlayingOffset(float) = 0;
+	virtual float getPlayingOffset() = 0;
+
 };
 
 

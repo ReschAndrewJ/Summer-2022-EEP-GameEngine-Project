@@ -38,3 +38,10 @@ float Loaded_Audio::getVolume() {
 	return sound.getVolume();
 }
 
+
+void Loaded_Audio::setPlayingOffset(float offset) { 
+	sound.setPlayingOffset(sf::seconds(offset));
+}
+float Loaded_Audio::getPlayingOffset() { 
+	return sound.getPlayingOffset().asSeconds();
+}

@@ -17,7 +17,7 @@ Object_Sprite::Object_Sprite() {
 
 	addAfterCreationFunction(&afterCreationFunction);
 	addBeforeDestructionFunction(&beforeDestructionFunction);
-	addProcessFunction(&processFunction);
+	addProcessFunction(&processFunction, 20);
 
 	addRequestedPointer(PTR_IDENTIFIER::IMG_CREATION_QUEUE_PTR, &imageCreationQueuePtr);
 	addRequestedPointer(PTR_IDENTIFIER::IMG_DESTRUCTION_QUEUE_PTR, &imageDestructionQueuePtr);
@@ -29,17 +29,17 @@ Object_Sprite::~Object_Sprite() {}
 
 
 void Object_Sprite::processFunction(Object* self, float delta) {
-	static_cast<Object_Sprite*>(self)->updatePushConstants();
+	dynamic_cast<Object_Sprite*>(self)->updatePushConstants();
 }
 
 
 void Object_Sprite::afterCreationFunction(Object* self) {
-	static_cast<Object_Sprite*>(self)->loadImage();
+	dynamic_cast<Object_Sprite*>(self)->loadImage();
 }
 
 
 void Object_Sprite::beforeDestructionFunction(Object* self) {
-	static_cast<Object_Sprite*>(self)->unloadImage();
+	dynamic_cast<Object_Sprite*>(self)->unloadImage();
 }
 
 struct imgPush_struct {
@@ -49,8 +49,8 @@ struct imgPush_struct {
 
 void Object_Sprite::loadImage() {
 	image_create_info imgInfo;
-	imgInfo.vertShaderPath = "Objects/Sprite/spriteVert.spv";
-	imgInfo.fragShaderPath = "Objects/Sprite/spriteFrag.spv";
+	imgInfo.vertShaderPath = "Resources/Shaders/spriteVert.spv";
+	imgInfo.fragShaderPath = "Resources/Shaders/spriteFrag.spv";
 	imgInfo.identifier = getIdentifier();
 	imgInfo.graphicsPipeline = "Sprite_Pipeline";
 
@@ -97,7 +97,8 @@ void Object_Sprite::unloadImage() {
 void Object_Sprite::updatePushConstants() {
 	imgPush_struct pushValues{};
 	pushValues.isVisible = (bool)getAttribute(ATTRIBUTE_SPRITE_VISIBLE) ? 1 : 0;
-	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), { getAttribute(ATTRIBUTE_SPRITE_WIDTH), getAttribute(ATTRIBUTE_SPRITE_HEIGHT), 0.0f });
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), { (float)getAttribute(ATTRIBUTE_SPRITE_WIDTH)/2, (float)getAttribute(ATTRIBUTE_SPRITE_HEIGHT)/2, 0.0f });
+	// vulkan uses range [-1,1] so width and height should be halved
 	
 	glm::mat4 cameraMat = glm::mat4(1.0);
 	{
@@ -105,7 +106,7 @@ void Object_Sprite::updatePushConstants() {
 		while (parent != "ROOT") {
 			auto obj = getObject(parent);
 			if (obj->is_class(OBJECT_CLASS_CAMERA)) {
-				cameraMat = ((Object_Camera*)obj)->getCameraTransformationMatrix();
+				cameraMat = dynamic_cast<Object_Camera*>(obj)->getCameraTransformationMatrix();
 				break;
 			}
 			parent = obj->getParentIdentifier();

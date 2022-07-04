@@ -46,10 +46,10 @@ glm::mat4 Object_Camera::getCameraTransformationMatrix() {
 
 	// rotate world in opposite rotation of camera
 	glm::mat4 viewRotateMat = glm::mat4(1.0f);
-	viewRotateMat = glm::rotate(viewRotateMat, glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_ROTATE_NOD)), { 1,0,0 });
-	viewRotateMat = glm::rotate(viewRotateMat, glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_ROTATE_TURN)), { 0,1,0 });
+	viewRotateMat = glm::rotate(glm::mat4(1.0f), glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_ROTATE_NOD)), { 1,0,0 }) * viewRotateMat;
+	viewRotateMat = glm::rotate(glm::mat4(1.0f), glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_ROTATE_TURN)), {0,1,0}) * viewRotateMat;
 	glm::vec3 viewAxis = viewRotateMat * glm::vec4{ 0,0,1,0 };
-	viewRotateMat = glm::rotate(viewRotateMat, glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_ROTATE_TILT)), viewAxis);
+	viewRotateMat = glm::rotate(glm::mat4(1.0f), glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_ROTATE_TILT)), viewAxis) * viewRotateMat;
 	viewRotateMat = glm::inverse(viewRotateMat);
 
 	glm::mat4 viewMat = viewRotateMat * viewTranslateMat;
@@ -60,10 +60,12 @@ glm::mat4 Object_Camera::getCameraTransformationMatrix() {
 	// perspective camera
 	int fWidth, fHeight;
 	glfwGetFramebufferSize(*windowPtr, &fWidth, &fHeight);
-	projectionMat = glm::perspective(
-		glm::radians((float)getAttribute(ATTRIBUTE_CAMERA_FOV)), (float)fWidth / fHeight,
-		(float)getAttribute(ATTRIBUTE_CAMERA_DEPTH_MIN), (float)getAttribute(ATTRIBUTE_CAMERA_DEPTH_MAX)
-	);		
+	if (fWidth != 0 && fHeight != 0) {
+		projectionMat = glm::perspective(
+			glm::radians((float)getAttribute(ATTRIBUTE_CAMERA_FOV)), (float)fWidth / fHeight,
+			(float)getAttribute(ATTRIBUTE_CAMERA_DEPTH_MIN), (float)getAttribute(ATTRIBUTE_CAMERA_DEPTH_MAX)
+		);
+	}
 
 	cameraTransformationMat = projectionMat * viewMat * scaleMat;
 	return cameraTransformationMat;

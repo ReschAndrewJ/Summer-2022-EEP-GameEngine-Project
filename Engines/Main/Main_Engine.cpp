@@ -1,6 +1,7 @@
 #include "Main_Engine.h"
 
 #include <chrono>
+#include <functional>
 
 void Main_Engine::start(engine_start_info startInfo) {
 	glfwInit();
@@ -18,6 +19,10 @@ void Main_Engine::start(engine_start_info startInfo) {
 
 	graphicsEngine.startupEngine(displayWindow);
 
+	objectLoader.setupBuiltInClasses();
+	for (auto& func : startInfo.AddedObjectCreateFunctions) {
+		objectLoader.addClassCreatorFunction(func.first, func.second);
+	}
 	Object* rootObj = new Object();
 	rootObj->identifier = "ROOT";
 	objectsContainer["ROOT"] = rootObj;
@@ -89,10 +94,19 @@ void Main_Engine::objectLoop() {
 		glfwPollEvents();
 		inputHandler.updateInputStates();
 
-		// run objects' processes
+		// queue objects' processes
+		std::map<int, std::vector < std::function<void()> >> sortedAndCurried;
+		float deltaAsVariable = delta;
 		for (auto& obj : objectsContainer) {
 			for (const auto& func : obj.second->process_functions) {
-				func(obj.second, delta);
+				sortedAndCurried[func.first].push_back([&func, &obj, deltaAsVariable]() { func.second(obj.second, deltaAsVariable); });
+			}
+		}
+
+		// run objects' proceses
+		for (auto& priority : sortedAndCurried) {
+			for (auto& curriedFunc : priority.second) {
+				curriedFunc();
 			}
 		}
 

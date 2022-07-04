@@ -2,7 +2,7 @@
 
 
 
-Object PerspectiveCamera Object_Camera
+Object PlayerCamera Object_PlayerCamera
 
 Double SpatialPosX 0
 Double SpatialPosY 0
@@ -24,13 +24,15 @@ Child Here testSprite3
 Child Here testSprite4
 Child Here testText
 Child Here testAnimatedSprite
+Child Here testPlayer
+Child Here react
 
 
 Object testSprite1 Object_Sprite
 
 Double SpatialPosX 0
 Double SpatialPosY 0 
-Double SpatialPosZ -0.5
+Double SpatialPosZ -1
 
 Integer SpriteWidth 32
 Integer SpriteHeight 32
@@ -121,3 +123,68 @@ Integer SpriteHeight 32
 Double SpatialPosX -64
 Double SpatialPosY 32
 
+
+Object testPlayer Object_Player
+
+String SpriteFilepath "./test_runFullEngine/test_spritesheet1.png"
+
+Integer AnimatedSpriteRowCnt 2
+Integer AnimatedSpriteColCnt 2
+
+Integer AnimatedSpriteFirstIndex 0
+Integer AnimatedSpriteLastIndex 3
+
+Double AnimatedSpriteDelay 0.2
+
+Boolean AnimatedSpriteIsPlaying true
+Boolean AnimatedSpriteDoesLoop true
+
+Integer SpriteWidth 16
+Integer SpriteHeight 16
+
+Double SpatialPosX 0
+Double SpatialPosY 0
+
+Double ColliderWidth 16
+Double ColliderHeight 16
+Double ColliderDepth 0.1
+
+Child Here showPlayerCollisionArea
+
+
+Object react Object_React
+
+Boolean SoundIsMusic false
+Double SoundVolume 50
+String SoundFilepath "./test_runFullEngine/test_sound1.wav"
+
+Double SpriteWidth 32
+Double SpriteHeight 32
+String SpriteFilepath "./test_runFullEngine/test_img3.png"
+
+Double ColliderWidth 32
+Double ColliderHeight 32
+Double ColliderDepth 0.1
+
+Double SpatialPosX 64
+Double SpatialPosY 0
+Double SpatialPosZ 30
+
+Double SpatialTurn -45
+
+
+Object showPlayerCollisionArea Object_Sprite
+
+Double SpatialPosX 0
+Double SpatialPosY 0 
+Double SpatialPosZ 0
+
+Integer SpriteWidth 16
+Integer SpriteHeight 16
+
+Double SpatialScaleX 1
+Double SpatialScaleY 1
+
+Boolean SpriteIsVisible true
+
+String SpriteFilepath "./test_runFullEngine/test_img1.png"

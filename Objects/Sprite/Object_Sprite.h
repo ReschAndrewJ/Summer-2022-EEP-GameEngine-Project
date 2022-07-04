@@ -26,7 +26,7 @@ const auto ATTRIBUTE_SPRITE_OPACITY = "SpriteOpacity";
 
 const auto ATTRIBUTE_SPRITE_IMG_IDENTIFIER = "SpriteImageIdentifier";
 
-class Object_Sprite : public Object_Spatial {
+class Object_Sprite : virtual public Object_Spatial {
 
 protected:
 	// <{owner object identifier, image identifier attribute name}, imageCreateInfo>

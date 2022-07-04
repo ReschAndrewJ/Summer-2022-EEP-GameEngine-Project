@@ -2,7 +2,6 @@
 
 #include <fstream>
 
-
 #ifndef UNIT_TESTS
 // include derived object classes
 #include "../Objects/Spatial/Object_Spatial.h"
@@ -13,10 +12,33 @@
 #include "../Objects/ActiveCollision/Object_ActiveCollision.h"
 #include "../Objects/AnimatedSprite/Object_AnimatedSprite.h"
 
+
+void Object_Loader::setupBuiltInClasses() {
+	addClassCreatorFunction(OBJECT_CLASS_BASE, [] {return new Object(); });
+	addClassCreatorFunction(OBJECT_CLASS_SPATIAL, [] {return (Object*) new Object_Spatial(); });
+	addClassCreatorFunction(OBJECT_CLASS_CAMERA, [] {return (Object*) new Object_Camera(); });
+	addClassCreatorFunction(OBJECT_CLASS_SPRITE, [] {return (Object*) new Object_Sprite(); });
+	addClassCreatorFunction(OBJECT_CLASS_ANIMATEDSPRITE, [] {return (Object*) new Object_AnimatedSprite(); });
+	addClassCreatorFunction(OBJECT_CLASS_TEXT, [] {return (Object*) new Object_Text(); });
+	addClassCreatorFunction(OBJECT_CLASS_COLLISION, [] {return (Object*) new Object_Collision(); });
+	addClassCreatorFunction(OBJECT_CLASS_ACTIVECOLLISION, [] {return (Object*) new Object_ActiveCollision(); });
+
+}
 #else
 #include "../Objects/Test/Object_Test1.h"
+	void Object_Loader::setupBuiltInClasses() {
+		addClassCreatorFunction(OBJECT_CLASS_BASE, [] {return new Object(); });
+		addClassCreatorFunction(OBJECT_CLASS_TEST1, [] {return (Object*) new Object_Test1(); });
+	}
 #endif
-//
+
+void Object_Loader::addClassCreatorFunction(std::string classIdentifier, Object* (*func)()) {
+	if (!createFuncs.count(classIdentifier)) createFuncs.insert({ classIdentifier, func });
+	else {
+		std::string err = "attempted to add object creation function for already managed class: " + classIdentifier + "\n";
+		printf(err.c_str());
+	}
+}
 
 
 std::pair<Object*, std::vector<std::pair<std::string, std::string>>> Object_Loader::createInstance(std::string filepath, std::string identifier) {
@@ -34,26 +56,15 @@ std::pair<Object*, std::vector<std::pair<std::string, std::string>>> Object_Load
 	Object_Info& ObjectInfo = loadedObjectInfos.at(filepath + '/' + identifier);
 	Object* newObject = nullptr;
 
-	if (ObjectInfo.class_identifier == OBJECT_CLASS_BASE) newObject = new Object();
-#ifndef UNIT_TESTS
-	// else if derived classes
-	else if (ObjectInfo.class_identifier == OBJECT_CLASS_SPATIAL) newObject = new Object_Spatial();
-	else if (ObjectInfo.class_identifier == OBJECT_CLASS_SPRITE) newObject = new Object_Sprite();
-	else if (ObjectInfo.class_identifier == OBJECT_CLASS_CAMERA) newObject = new Object_Camera();
-	else if (ObjectInfo.class_identifier == OBJECT_CLASS_COLLISION) newObject = new Object_Collision();
-	else if (ObjectInfo.class_identifier == OBJECT_CLASS_TEXT) newObject = new Object_Text();
-	else if (ObjectInfo.class_identifier == OBJECT_CLASS_ACTIVECOLLISION) newObject = new Object_ActiveCollision();
-	else if (ObjectInfo.class_identifier == OBJECT_CLASS_ANIMATEDSPRITE) newObject = new Object_AnimatedSprite();
+	if (createFuncs.count(ObjectInfo.class_identifier)) {
+		newObject = createFuncs.at(ObjectInfo.class_identifier)();
+	}
+	else {
+		newObject = nullptr;
 
-
-#else
-	else  if (ObjectInfo.class_identifier == OBJECT_CLASS_TEST1) newObject = new Object_Test1();
-#endif
-	//
-	if (newObject == nullptr) {
 		std::string err = "attempted to load object with unmanaged object class: " + ObjectInfo.class_identifier + "\n";
 		printf(err.c_str());
-		return { new Object(), {}};
+		return { new Object(), {} };
 	}
 
 	for (const auto& attr : ObjectInfo.attributes) {

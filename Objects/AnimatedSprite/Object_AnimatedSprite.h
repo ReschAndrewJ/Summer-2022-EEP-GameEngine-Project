@@ -32,7 +32,7 @@ const auto ATTRIBUTE_ANIMATEDSPRITE_ISPLAYING = "AnimatedSpriteIsPlaying";
 const auto ATTRIBUTE_ANIMATEDSPRITE_LOOP = "AnimatedSpriteDoesLoop";
 
 
-class Object_AnimatedSprite : public Object_Sprite
+class Object_AnimatedSprite : virtual public Object_Sprite
 {
 public:
 	Object_AnimatedSprite();

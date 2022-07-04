@@ -26,7 +26,7 @@ const auto ATTRIBUTE_SPATIAL_SCALE_Z = "SpatialScaleZ";
 // perform parent transformations in addition to own, default=true
 const auto ATTRIBUTE_SPATIAL_PARENT_TRANSFORMATIONS_INHERIT = "InheritParentTransform";
 
-class Object_Spatial : public Object {
+class Object_Spatial : virtual public Object {
 	
 public:
 	Object_Spatial();
@@ -38,6 +38,7 @@ public:
 	
 
 protected:
+	// NOT USED
 	// builds a rotation matrix using a starting orientation and an ending orientation
 	glm::mat4 rotateToVec(glm::vec3 rotateFrom, glm::vec3 rotateTo);
 

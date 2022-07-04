@@ -3,6 +3,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <set>
 #include <unordered_set>
 #include <memory>
 #include <tuple>
@@ -29,7 +30,7 @@ private:
 	// string identifiers of the children objects
 	std::unordered_set<std::string> children;
 
-	std::unordered_set<void(*)(Object*, float)> process_functions;
+	std::set<std::pair<int, void(*)(Object*, float)>> process_functions; // <priority, func>, lower values run first
 	std::unordered_set<void(*)(Object*)> afterCreation_functions;
 	std::unordered_set<void(*)(Object*)> beforeDestruction_functions;
 	std::unordered_set<std::string> class_identifiers;
@@ -42,7 +43,7 @@ private:
 	/* points to the object destruction queue in the main engine */
 	std::unordered_set<std::string>* objectDestructionQueuePtr;
 
-	std::unordered_map<PTR_IDENTIFIER, void*> requestedPointers;
+	std::vector<std::pair<PTR_IDENTIFIER, void*>> requestedPointers;
 
 protected:
 	/* insert a new attribute into the attributes map,
@@ -59,8 +60,9 @@ protected:
 	void addRequestedPointer(PTR_IDENTIFIER, void*);
 
 	/* adds a function to be called every frame,
-	should be called in the class constructor */
-	void addProcessFunction(void(*func)(Object*, float));
+	should be called in the class constructor,
+	functions with lower priority values run first */
+	void addProcessFunction(void(*func)(Object*, float), int priority);
 
 	/* adds a function to be called after the creation step of the frame it is created during,
 	should be called in the class constructor */

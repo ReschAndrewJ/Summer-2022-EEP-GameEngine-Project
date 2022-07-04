@@ -15,9 +15,9 @@ std::vector<std::string> Object_ActiveCollision::move(double movX, double movY, 
 	double currentZ = getAttribute(ATTRIBUTE_SPATIAL_POSITION_Z);
 
 	// set target position
-	double targetX = movX * magnitude * delta;
-	double targetY = movX * magnitude * delta;
-	double targetZ = movZ * magnitude * delta;
+	double targetX = currentX + movX * magnitude * delta;
+	double targetY = currentY + movY * magnitude * delta;
+	double targetZ = currentZ + movZ * magnitude * delta;
 
 	setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, targetX);
 	setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, targetY);

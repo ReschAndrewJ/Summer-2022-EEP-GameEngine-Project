@@ -80,7 +80,7 @@ std::pair<std::vector<unsigned char>, std::pair<int,int>> FontManager::getCharac
 	auto error = FT_Load_Glyph(font, glyphIndex, FT_LOAD_COLOR);
 	if (error) error = FT_Load_Glyph(font, glyphIndex, FT_LOAD_DEFAULT); format_color = false;
 	if (error) {
-		std::string err = "failed to load character glyph, character: " + std::string(1, character) + "\n" +
+		std::string err = "failed to load character glyph, character: " + std::string(1, (char)character) + "\n" +
 			"font filepath: " + fontFilepath + "\n";
 	}
 

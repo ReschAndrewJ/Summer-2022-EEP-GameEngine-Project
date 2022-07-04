@@ -3,7 +3,10 @@
 
 #include "Audio.h"
 
+#include <unordered_map>
 
+const auto AUDIO_TYPE_LOADED = "AUDIO_TYPE_LOADED";
+const auto AUDIO_TYPE_STREAMED = "AUDIO_TYPE_STREAMED";
 
 class Sound_Engine
 {
@@ -14,8 +17,7 @@ private:
 	// should never be set above 256, internal limit varies by platform
 	static const unsigned maxSoundCount = 50;
 
-	Audio* sounds[maxSoundCount];
-
+	std::unordered_map<std::string, Audio*> audioContainer;
 
 public:
 	void clearEngine();
@@ -24,22 +26,22 @@ public:
 	void setGlobalVolume(float);
 	float getGlobalVolume();
 
-	/* int audioIndex = addAudio(string filepath, std::string audioType)
-	return -1 on failure */
-	int addAudio(std::string, std::string);
-	// free audio at index
-	void removeAudio(int);
+	bool loadAudio(std::string filepath, std::string audioIdentifier, std::string AudioType);
 
-	// playAudio(unsigned int audioIndex) 
-	void playAudio(int);
-	// stopAudio(unsigned int audioIndex)
-	void stopAudio(int);
-	void pauseAudio(int);
+	void removeAudio(std::string audioIdentifier);
 
-	void setAudioVolume(int, float);
-	// return -1 if there is no audio stored at the index
-	float getAudioVolume(int);
+	// return false on failure
+	bool playAudio(std::string audioIdentifier);
 
+	void stopAudio(std::string audioIdentifier);
+	void pauseAudio(std::string audioIdentifier);
+
+	void setAudioVolume(std::string audioIdentifier, float volume);
+	// return -1 if the audio is not stored
+	float getAudioVolume(std::string audioIdentifier);
+
+	float getAudioOffset(std::string audioIdentifier);
+	void setAudioOffset(std::string audioIdentifier, float offset);
 };
 
 

@@ -26,12 +26,12 @@ void Object::addClassIdentifier(std::string identifier) {
 
 
 void Object::addRequestedPointer(PTR_IDENTIFIER ptrEnum, void* ptr) {
-	requestedPointers.insert({ ptrEnum, ptr });
+	requestedPointers.push_back({ ptrEnum, ptr });
 }
 
 
-void Object::addProcessFunction(void(*func)(Object*, float)) {
-	process_functions.insert(func);
+void Object::addProcessFunction(void(*func)(Object*, float), int priority) {
+	process_functions.insert({ priority, func });
 }
 
 

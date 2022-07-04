@@ -1,4 +1,5 @@
 #ifndef IMAGE_CREATE_INFO
+#define IMAGE_CREATE_INFO
 
 #include <string>
 #include <stdint.h>
@@ -15,8 +16,8 @@ struct image_create_info {
 	uint32_t pushConstantsSizeBytes = 0;
 	std::vector<unsigned char> initalPushConstantsValues;
 
-	unsigned int texture_rows = 0;
-	unsigned int texture_columns = 0;
+	uint32_t texture_rows = 0;
+	uint32_t texture_columns = 0;
 	std::vector<unsigned char> pixels;
 };
 

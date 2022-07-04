@@ -20,8 +20,9 @@ int main() {
 	iHandler.initializeInput_Handler(window);
 	
 	iHandler.setupKeyInput("Enter", GLFW_KEY_ENTER);
-
-	std::cout << glfwGetJoystickName(0) << std::endl;
+	if (iHandler.isControllerConnected(0)) {
+		std::cout << glfwGetJoystickName(0) << std::endl;
+	}
 
 	while (!glfwWindowShouldClose(window)) {
 

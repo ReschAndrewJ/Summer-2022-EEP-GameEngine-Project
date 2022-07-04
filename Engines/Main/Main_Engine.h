@@ -33,6 +33,7 @@ struct engine_start_info {
 	unsigned int maxFramerate = 60;
 
 	std::vector<std::pair<std::string, int>> keysToPoll;
+	std::vector<std::pair<std::string, Object* (*)()>> AddedObjectCreateFunctions; // <classIdentifier, lambda>
 
 	std::string rootObject_filePath;
 	std::string rootObject_objectName;

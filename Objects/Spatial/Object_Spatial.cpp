@@ -39,10 +39,10 @@ glm::mat4 Object_Spatial::getTransformationMatrix(glm::mat4 childTransform) {
 	// nod -> turn -> tilt
 	glm::mat4 rotationMat = glm::mat4(1.0f);
 	
-	rotationMat = glm::rotate(rotationMat, glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_ROTATE_NOD)), {1,0,0});
-	rotationMat = glm::rotate(rotationMat, glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_ROTATE_TURN)), { 0,1,0 });
+	rotationMat = glm::rotate(glm::mat4(1), glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_ROTATE_NOD)), {1,0,0}) * rotationMat;
+	rotationMat = glm::rotate(glm::mat4(1), glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_ROTATE_TURN)), {0,1,0}) * rotationMat;
 	glm::vec3 viewAxis = rotationMat * glm::vec4{ 0,0,1,0 };
-	rotationMat = glm::rotate(rotationMat,glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_ROTATE_TILT)), viewAxis);
+	rotationMat = glm::rotate(glm::mat4(1), glm::radians((float)getAttribute(ATTRIBUTE_SPATIAL_ROTATE_TILT)), viewAxis) * rotationMat;
 
 
 	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0), glm::vec3(
@@ -54,8 +54,8 @@ glm::mat4 Object_Spatial::getTransformationMatrix(glm::mat4 childTransform) {
 	
 	if ((bool)getAttribute(ATTRIBUTE_SPATIAL_PARENT_TRANSFORMATIONS_INHERIT) && !getParentIdentifier().empty()
 		&& getObject(getParentIdentifier())->is_class(OBJECT_CLASS_SPATIAL)) {
-		return ((Object_Spatial*)
-			getObject(getParentIdentifier())
+		return (dynamic_cast<Object_Spatial*>(
+			getObject(getParentIdentifier()))
 			)->getTransformationMatrix(transformationMat);
 	}
 	return transformationMat;

@@ -34,3 +34,11 @@ float Streamed_Audio::getVolume() {
 	return music.getVolume();
 }
 
+
+void Streamed_Audio::setPlayingOffset(float offset) {
+	music.setPlayingOffset(sf::seconds(offset));
+}
+
+float Streamed_Audio::getPlayingOffset() {
+	return music.getPlayingOffset().asSeconds();
+}

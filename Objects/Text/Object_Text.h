@@ -18,7 +18,7 @@ const auto ATTRIBUTE_TEXT_ROW_LENGTH = "TextRowLen";
 const auto ATTRIBUTE_TEXT_ROW_COUNT = "TextRowCount";
 
 
-class Object_Text : public Object_Sprite {
+class Object_Text : virtual public Object_Sprite {
 
 public:
 	Object_Text();

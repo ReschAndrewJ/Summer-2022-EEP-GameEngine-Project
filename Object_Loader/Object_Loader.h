@@ -26,11 +26,18 @@ private:
 	std::unordered_map<std::string/*filepath+/+identifier*/, Object_Info> loadedObjectInfos;
 	std::unordered_set<std::string/*filepath*/> loadedFiles;
 
+	std::unordered_map<std::string, Object* (*)()> createFuncs{};
+
 public:
 	/* creates an object using the instancing data from a .inst file
 	pair<Object* newObject, vector<pair<string filepath, string identifier>> children> createInstance(string filepath, string objectIdentifier) */
 	std::pair<Object*, std::vector<std::pair<std::string, std::string>>> createInstance(std::string filepath, std::string objectIdentifier);
 
+	// add classes to the object loader without modifying the object loader's code
+	void addClassCreatorFunction(std::string classIdentifier, Object* (*func)());
+
+	// adds classes to the object loader hard coded into the engine
+	void setupBuiltInClasses();
 
 private:
 	/* loads a .inst file */

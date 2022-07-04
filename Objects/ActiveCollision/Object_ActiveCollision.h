@@ -7,7 +7,7 @@
 const auto OBJECT_CLASS_ACTIVECOLLISION = "Object_ActiveCollision";
 
 
-class Object_ActiveCollision : public Object_Collision {
+class Object_ActiveCollision : virtual public Object_Collision {
 public:
 	Object_ActiveCollision();
 	virtual ~Object_ActiveCollision();

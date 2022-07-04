@@ -20,7 +20,7 @@ Object_AnimatedSprite::Object_AnimatedSprite() {
 	createAttribute(ATTRIBUTE_ANIMATEDSPRITE_ISPLAYING, Attribute::types::BOOLEAN);
 	createAttribute(ATTRIBUTE_ANIMATEDSPRITE_LOOP, Attribute::types::BOOLEAN);
 
-	addProcessFunction(&processFunction);
+	addProcessFunction(&processFunction, 19);
 }
 Object_AnimatedSprite::~Object_AnimatedSprite() {}
 
@@ -34,8 +34,8 @@ struct animatedSpritePush_struct {
 
 void Object_AnimatedSprite::loadImage() {
 	image_create_info imgInfo;
-	imgInfo.vertShaderPath = "Objects/AnimatedSprite/animatedSpriteVert.spv";
-	imgInfo.fragShaderPath = "Objects/AnimatedSprite/animatedSpriteFrag.spv";
+	imgInfo.vertShaderPath = "Resources/Shaders/animatedSpriteVert.spv";
+	imgInfo.fragShaderPath = "Resources/Shaders/animatedSpriteFrag.spv";
 	imgInfo.identifier = getIdentifier();
 	imgInfo.graphicsPipeline = "AnimatedSprite_Pipeline";
 
@@ -79,14 +79,14 @@ void Object_AnimatedSprite::updatePushConstants() {
 	animatedSpritePush_struct pushValues{};
 	pushValues.isVisible = (bool)getAttribute(ATTRIBUTE_SPRITE_VISIBLE);
 
-	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), { getAttribute(ATTRIBUTE_SPRITE_WIDTH), getAttribute(ATTRIBUTE_SPRITE_HEIGHT), 0.0f });
+	glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), { (float)getAttribute(ATTRIBUTE_SPRITE_WIDTH)/2, (float)getAttribute(ATTRIBUTE_SPRITE_HEIGHT)/2, 0.0f });
 	glm::mat4 cameraMat = glm::mat4(1.0);
 	{
 		auto parent = getParentIdentifier();
 		while (parent != "ROOT") {
 			auto obj = getObject(parent);
 			if (obj->is_class(OBJECT_CLASS_CAMERA)) {
-				cameraMat = ((Object_Camera*)obj)->getCameraTransformationMatrix();
+				cameraMat = dynamic_cast<Object_Camera*>(obj)->getCameraTransformationMatrix();
 				break;
 			}
 			parent = obj->getParentIdentifier();
@@ -99,13 +99,13 @@ void Object_AnimatedSprite::updatePushConstants() {
 	long long column = cellIndex % columnCount;
 
 	float left = (float)column / columnCount;
-	float right = left + 1.0 / columnCount;
+	float right = left + 1.0f / columnCount;
 
 	long long rowCount = getAttribute(ATTRIBUTE_ANIMATEDSPRITE_NUM_ROWS);
 	long long row = cellIndex / columnCount;
 
 	float top = (float)row / rowCount;
-	float bottom = top + 1.0 / rowCount;
+	float bottom = top + 1.0f / rowCount;
 	
 	pushValues.cellCoords[0] = { left, top };
 	pushValues.cellCoords[1] = { right, top };
@@ -123,12 +123,12 @@ void Object_AnimatedSprite::updatePushConstants() {
 
 
 void Object_AnimatedSprite::processFunction(Object* self, float delta) {
-	Object_AnimatedSprite* selfPtr = (Object_AnimatedSprite*)self;
+	Object_AnimatedSprite* selfPtr = dynamic_cast<Object_AnimatedSprite*>(self);
 	if (!selfPtr->getAttribute(ATTRIBUTE_ANIMATEDSPRITE_ISPLAYING)) return;
 
 	double timeToNext = (double)selfPtr->getAttribute(ATTRIBUTE_ANIMATEDSPRITE_TIME_TO_NEXT_IMAGE) - delta;
 	if (timeToNext <= 0) {
-		int nextIndex = (long long)selfPtr->getAttribute(ATTRIBUTE_ANIMATEDSPRITE_CURRENT_INDEX) + 1;
+		long long nextIndex = (long long)selfPtr->getAttribute(ATTRIBUTE_ANIMATEDSPRITE_CURRENT_INDEX) + 1;
 		if (nextIndex > (long long)selfPtr->getAttribute(ATTRIBUTE_ANIMATEDSPRITE_LAST_INDEX)) {
 			if ((bool)selfPtr->getAttribute(ATTRIBUTE_ANIMATEDSPRITE_LOOP)) {
 				nextIndex = (long long)selfPtr->getAttribute(ATTRIBUTE_ANIMATEDSPRITE_FIRST_INDEX);

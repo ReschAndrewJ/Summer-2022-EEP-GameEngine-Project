@@ -48,6 +48,7 @@ void Input_Handler::updateInputStates() {
 		}
 	}
 	glfwGetCursorPos(input_window, &mouse_cursor_position[0], &mouse_cursor_position[1]);
+	if (glfwGetInputMode(input_window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED) glfwSetCursorPos(input_window, 0, 0);
 	for (int button_i = 0; button_i <= GLFW_MOUSE_BUTTON_LAST; ++button_i) {
 		if (glfwGetMouseButton(input_window, button_i) == GLFW_PRESS) {
 			mouse_button_states[button_i] = mouse_button_states[button_i] & input_states::PRESSED ? input_states::PRESSED : input_states::JUST_PRESSED;
@@ -163,6 +164,10 @@ void Input_Handler::setMouseCursorHidden() {
 }
 void Input_Handler::setMouseCursorLocked() {
 	glfwSetInputMode(input_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	glfwSetCursorPos(input_window, 0, 0);
+	if (glfwRawMouseMotionSupported()) {
+		glfwSetInputMode(input_window, GLFW_RAW_MOUSE_MOTION, true);
+	}
 }
 void Input_Handler::setMouseCursorNormal() {
 	glfwSetInputMode(input_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
