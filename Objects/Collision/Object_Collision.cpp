@@ -15,8 +15,10 @@ Object_Collision::Object_Collision() {
 	createAttribute(ATTRIBUTE_COLLIDER_IGNORE_X, Attribute::types::BOOLEAN);
 	*/
 
-	createAttribute(ATTRIBUTE_COLLIDER_DETECTABLE, Attribute::types::BOOLEAN);
-	setAttribute(ATTRIBUTE_COLLIDER_DETECTABLE, true);
+	createAttribute(ATTRIBUTE_COLLIDER_MASK_OWN, Attribute::types::INTEGER);
+	createAttribute(ATTRIBUTE_COLLIDER_MASK_TARGET, Attribute::types::INTEGER);
+	setAttribute(ATTRIBUTE_COLLIDER_MASK_OWN, 1);
+	setAttribute(ATTRIBUTE_COLLIDER_MASK_TARGET, 1);
 	
 	addRequestedPointer(PTR_IDENTIFIER::OBJ_CONTAINER_PTR, &objectContainerPtr);
 }
@@ -29,7 +31,7 @@ std::vector<std::string> Object_Collision::getCollidingObjects() {
 
 	for (auto& obj : *objectContainerPtr) {
 		if (!obj.second->is_class(OBJECT_CLASS_COLLISION) 
-			|| !obj.second->getAttribute(ATTRIBUTE_COLLIDER_DETECTABLE)
+			|| !((int)obj.second->getAttribute(ATTRIBUTE_COLLIDER_MASK_OWN) & (int)getAttribute(ATTRIBUTE_COLLIDER_MASK_TARGET))
 			|| obj.first == getIdentifier()) continue;
 
 		if (checkIsColliding(dynamic_cast<Object_Collision*>(obj.second))) collidingObjs.push_back(obj.first);

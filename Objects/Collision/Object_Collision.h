@@ -21,10 +21,10 @@ const auto ATTRIBUTE_COLLIDER_IGNORE_Y = "ColliderIgnoreY";
 const auto ATTRIBUTE_COLLIDER_IGNORE_X = "ColliderIgnoreX";
 */
 
-// a non-detectable collision object will be excluded from the collision tests of 
-// other collision objects
-
-const auto ATTRIBUTE_COLLIDER_DETECTABLE = "ColliderDetectable";
+// colliion objects detect collisions only from objects whose collider mask matches the target mask
+// default: 1
+const auto ATTRIBUTE_COLLIDER_MASK_TARGET = "ColliderMaskTarget";
+const auto ATTRIBUTE_COLLIDER_MASK_OWN = "ColliderMask";
 
 class Object_Collision : virtual public Object_Spatial {
 protected:
