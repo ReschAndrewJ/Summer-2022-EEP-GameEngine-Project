@@ -535,7 +535,7 @@ namespace UnitTests
 		}
 		TEST_METHOD(MockObjectCreateQueue) {
 			std::unordered_map<std::string, Object*> objects;
-			std::vector<std::tuple< std::string, std::string, std::string>> mockCreateQueue;
+			std::vector<std::tuple< std::string, std::string, std::string, std::vector<std::pair<std::string, Attribute>>>> mockCreateQueue;
 			Object test_object;
 			test_object.objectContainerPtr = &objects;
 			test_object.identifier = "test_object";
@@ -988,7 +988,7 @@ namespace UnitTests
 		}
 
 		TEST_METHOD(AlignedBBPerformance) {
-			const size_t cycles = 100;
+			const size_t cycles = 1000;
 			double combined_time = 0;
 
 			for (size_t i = 0; i < cycles; ++i) {
@@ -1013,7 +1013,7 @@ namespace UnitTests
 		}
 
 		TEST_METHOD(HalfCollisionTimesTwo) {
-			const size_t cycles = 100;
+			const size_t cycles = 1000;
 			double combined_time = 0;
 
 			for (size_t i = 0; i < cycles; ++i) {
@@ -1029,6 +1029,31 @@ namespace UnitTests
 
 				objectA->halfCollisionCheck(objectB);
 				objectB->halfCollisionCheck(objectA);
+
+				auto end = std::chrono::steady_clock::now();
+				std::chrono::duration<double, std::milli> elapsed = end - start;
+				combined_time += elapsed.count();
+			}
+			double avg = combined_time / cycles;
+			Logger::WriteMessage(("Average Time: " + std::to_string(avg) + "ms").data());
+		}
+
+		TEST_METHOD(CombinedPerformance) {
+			const size_t cycles = 1000;
+			double combined_time = 0;
+
+			for (size_t i = 0; i < cycles; ++i) {
+				objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, (rand() % 21 - 10) / 10);
+				objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, (rand() % 21 - 10) / 10);
+				objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, (rand() % 21 - 10) / 10);
+
+				objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, (rand() % 21 - 10) / 10);
+				objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, (rand() % 21 - 10) / 10);
+				objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, (rand() % 21 - 10) / 10);
+
+				auto start = std::chrono::steady_clock::now();
+
+				objectA->checkIsColliding(objectB);
 
 				auto end = std::chrono::steady_clock::now();
 				std::chrono::duration<double, std::milli> elapsed = end - start;

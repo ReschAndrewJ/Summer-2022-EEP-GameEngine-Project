@@ -55,8 +55,8 @@ private:
 	std::unordered_map <std::string, Object*> objectsContainer;
 	// Object Queues
 	// 
-	// <filepath, objectName, parentIdentifier>
-	std::vector<std::tuple<std::string, std::string, std::string>> objectCreationQueue;
+	// <filepath, objectName, parentIdentifier, modifiedAttributes>
+	std::vector<std::tuple<std::string, std::string, std::string, std::vector<std::pair<std::string, Attribute>>>> objectCreationQueue;
 	// <objectIdentifier>
 	std::unordered_set<std::string> objectDestructionQueue;
 	

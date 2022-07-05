@@ -43,7 +43,14 @@ std::vector<std::string> Object_Collision::getCollidingObjects() {
 
 bool Object_Collision::checkIsColliding(Object_Collision* collider) {
 	// if the aligned bounding boxes collide, check if the actual collision boxes collide
-	return checkforAlignedBBColision(collider) && halfCollisionCheck(collider) && collider->halfCollisionCheck(this);
+	//return checkforAlignedBBColision(collider) && halfCollisionCheck(collider) && collider->halfCollisionCheck(this);
+	
+	// performance testing showed that on average, leading with the aligned full bounding box collision test
+	// had little to no impact on the performance of checkIsColliding, with the slight impact slowing the function
+	// rather than speeding it up, this is likely due to the similarity between the bounding box check and  
+	// halfCollisionCheck, using nearly the same number of matrix multiplications for a similar likelihood of 
+	// determining a non-collision in the first call
+	return halfCollisionCheck(collider) && collider->halfCollisionCheck(this);
 }
 
 

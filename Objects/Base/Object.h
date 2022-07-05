@@ -39,7 +39,7 @@ private:
 	std::unordered_map<std::string, Object*>* objectContainerPtr;
 	/* points to the object creation queue in the main engine
 	<string filepath, string objectName, string objectParent>*/
-	std::vector<std::tuple<std::string, std::string, std::string>>* objectCreationQueuePtr;
+	std::vector<std::tuple<std::string, std::string, std::string, std::vector<std::pair<std::string, Attribute>>>>* objectCreationQueuePtr;
 	/* points to the object destruction queue in the main engine */
 	std::unordered_set<std::string>* objectDestructionQueuePtr;
 
@@ -93,7 +93,7 @@ public:
 	Object* getObject(std::string objectName);
 
 	// adds an object to the object creation queue in the main engine
-	void queueCreateObject(std::string filepath, std::string objectName, std::string objectParent);
+	void queueCreateObject(std::string filepath, std::string objectName, std::string objectParent, std::vector<std::pair<std::string, Attribute>> modifiedAttributes = {});
 
 	// adds an object to the object destructino queue in the main engine
 	void queueDestroyObject(std::string objectIdentifier);

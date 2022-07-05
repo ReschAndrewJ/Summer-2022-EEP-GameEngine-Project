@@ -61,7 +61,7 @@ public:
 		self.setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, pos.y);
 		self.setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, pos.z);
 
-		float nod = (float)self.getAttribute(ATTRIBUTE_SPATIAL_ROTATE_NOD) + self.inputHandlerPtr->getMouseCursorPosition().second * delta * 20;
+		float nod = (float)self.getAttribute(ATTRIBUTE_SPATIAL_ROTATE_NOD) + (float)self.inputHandlerPtr->getMouseCursorPosition().second * delta * 20;
 		if (nod > 90) nod = 90; if (nod < -90) nod = -90;
 		self.setAttribute(ATTRIBUTE_SPATIAL_ROTATE_NOD, nod);
 		self.setAttribute(ATTRIBUTE_SPATIAL_ROTATE_TURN,

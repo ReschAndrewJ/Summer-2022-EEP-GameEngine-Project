@@ -27,7 +27,7 @@ void Main_Engine::start(engine_start_info startInfo) {
 	rootObj->identifier = "ROOT";
 	objectsContainer["ROOT"] = rootObj;
 	if (!startInfo.rootObject_filePath.empty() && !startInfo.rootObject_objectName.empty()) {
-		objectCreationQueue.push_back({ startInfo.rootObject_filePath, startInfo.rootObject_objectName, "ROOT" });
+		objectCreationQueue.push_back({ startInfo.rootObject_filePath, startInfo.rootObject_objectName, "ROOT", {} });
 	}
 
 	shortestFrameLength = 1.0f / startInfo.maxFramerate;
@@ -213,10 +213,13 @@ void Main_Engine::createObjectsInQueue() {
 				default: *(pointer) = nullptr; break;
 			}
 		}
+		for (auto& attr : std::get<3>(queuedObj)) {
+			newObj.first->setAttribute(attr.first, attr.second);
+		}
 		objectsContainer.insert({ identifer, newObj.first });
 		
 		for (size_t j = 0; j < newObj.second.size(); ++j) {
-			objectCreationQueue.push_back({newObj.second[j].first, newObj.second[j].second, identifer});
+			objectCreationQueue.push_back({ newObj.second[j].first, newObj.second[j].second, identifer, {} });
 		}
 		newIdentifiers.push_back(identifer);
 	}

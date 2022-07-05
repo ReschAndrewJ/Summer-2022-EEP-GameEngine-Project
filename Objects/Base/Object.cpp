@@ -66,8 +66,8 @@ Object* Object::getObject(std::string identifier) {
 }
 
 
-void Object::queueCreateObject(std::string filepath, std::string objectName, std::string objectParent) {
-	objectCreationQueuePtr->push_back({ filepath, objectName, objectParent });
+void Object::queueCreateObject(std::string filepath, std::string objectName, std::string objectParent, std::vector<std::pair<std::string, Attribute>> modifiedAttributes) {
+	objectCreationQueuePtr->push_back({ filepath, objectName, objectParent, modifiedAttributes });
 }
 
 
