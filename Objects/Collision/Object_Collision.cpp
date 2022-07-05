@@ -53,20 +53,22 @@ bool Object_Collision::checkforAlignedBBColision(Object_Collision* collider) {
 	collider->getBoundingPoints(colliderBoundingPoints);
 
 	// x-seperation axis
-	if (ownBoundingPoints[0] > colliderBoundingPoints[1]
-		|| colliderBoundingPoints[0] > ownBoundingPoints[1]) return false;
+	if (ownBoundingPoints[0] >= colliderBoundingPoints[1]
+		|| colliderBoundingPoints[0] >= ownBoundingPoints[1]) return false;
 	// y-seperation axis
-	if (ownBoundingPoints[2] > colliderBoundingPoints[3]
-		|| colliderBoundingPoints[2] > ownBoundingPoints[3]) return false;
+	if (ownBoundingPoints[2] >= colliderBoundingPoints[3]
+		|| colliderBoundingPoints[2] >= ownBoundingPoints[3]) return false;
 	// z-seperation axis
-	if (ownBoundingPoints[4] > colliderBoundingPoints[5]
-		|| colliderBoundingPoints[4] > ownBoundingPoints[5]) return false;
+	if (ownBoundingPoints[4] >= colliderBoundingPoints[5]
+		|| colliderBoundingPoints[4] >= ownBoundingPoints[5]) return false;
 	return true;
 }
 
 
 void Object_Collision::getBoundingPoints(float returnArray[6]) {
 	glm::mat4 transform = getTransformationMatrix();
+
+	// get collider points
 	glm::vec3 point1 = {
 		(float)getAttribute(ATTRIBUTE_COLLIDER_WIDTH) / 2,
 		(float)getAttribute(ATTRIBUTE_COLLIDER_HEIGHT) / 2,
@@ -82,11 +84,13 @@ void Object_Collision::getBoundingPoints(float returnArray[6]) {
 		{ -point1.x, -point1.y, -point1.z }
 	};
 
+	// transform collider points
 	point1 = transform * glm::vec4{ point1, 1.0f };
 	for (int i = 0; i < 7; ++i) {
 		p[i] = transform * glm::vec4{ p[i], 1.0f };
 	}
 
+	// find min and max bounds for collider points
 	for (int i = 0; i < 3; ++i) {
 		returnArray[2*i] = point1[i];
 		returnArray[2*i + 1] = point1[i];
@@ -119,7 +123,7 @@ bool Object_Collision::halfCollisionCheck(Object_Collision* collider) {
 	for (int i = 0; i < 7; ++i) {
 		p[i] = transform * glm::vec4{ p[i], 1.0f };
 	}
-
+	
 	float colliderBounds[6]{ 0 };
 	for (int i = 0; i < 3; ++i) {
 		colliderBounds[2 * i] = point1[i];
@@ -135,14 +139,13 @@ bool Object_Collision::halfCollisionCheck(Object_Collision* collider) {
 	float ownZ = getAttribute(ATTRIBUTE_COLLIDER_DEPTH);
 	
 	// x-seperation axis
-	if (colliderBounds[0] > ownX / 2
-		|| colliderBounds[1] < -ownX / 2) return false;
+	if (colliderBounds[0] >= ownX / 2
+		|| colliderBounds[1] <= -ownX / 2) return false;
 	// y-seperation axis
-	if (colliderBounds[2] > ownY / 2
-		|| colliderBounds[3] < -ownY / 2) return false;
+	if (colliderBounds[2] >= ownY / 2
+		|| colliderBounds[3] <= -ownY / 2) return false;
 	// z-seperation axis
-	if (colliderBounds[4] > ownZ / 2
-		|| colliderBounds[5] < -ownZ / 2) return false;
+	if (colliderBounds[4] >= ownZ / 2
+		|| colliderBounds[5] <= -ownZ / 2) return false;
 	return true;
-
 }

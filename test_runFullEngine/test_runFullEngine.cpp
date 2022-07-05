@@ -126,6 +126,8 @@ public:
 		self.inputHandlerPtr->setupKeyInput("DOWN", GLFW_KEY_DOWN);
 		self.inputHandlerPtr->setupKeyInput("LEFT", GLFW_KEY_LEFT);
 		self.inputHandlerPtr->setupKeyInput("RIGHT", GLFW_KEY_RIGHT);
+		self.inputHandlerPtr->setupKeyInput("ENTER", GLFW_KEY_ENTER);
+		self.inputHandlerPtr->setupKeyInput("RSHIFT", GLFW_KEY_RIGHT_SHIFT);
 	}
 
 	static void processFunc(Object* selfPtr, float delta) {
@@ -137,6 +139,8 @@ public:
 		if (self.inputHandlerPtr->getKeyState("DOWN", input_states::PRESSED)) mov.z += +20;
 		if (self.inputHandlerPtr->getKeyState("LEFT", input_states::PRESSED)) mov.x -= 20;
 		if (self.inputHandlerPtr->getKeyState("RIGHT", input_states::PRESSED)) mov.x += 20;
+		if (self.inputHandlerPtr->getKeyState("ENTER", input_states::PRESSED)) mov.y -= 20;
+		if (self.inputHandlerPtr->getKeyState("RSHIFT", input_states::PRESSED)) mov.y += 20;
 
 		if (mov != glm::vec3{ 0,0,0 }) {
 			auto collisions = self.move(mov.x, mov.y, mov.z, delta, 2);

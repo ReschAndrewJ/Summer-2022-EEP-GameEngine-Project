@@ -170,6 +170,7 @@ Double SpatialPosX 64
 Double SpatialPosY 0
 Double SpatialPosZ 30
 
+Double SpatialNod 45
 Double SpatialTurn -45
 
 

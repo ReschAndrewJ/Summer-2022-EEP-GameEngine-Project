@@ -47,7 +47,7 @@ private:
 	bool checkforAlignedBBColision(Object_Collision* collider);
 	void getBoundingPoints(float returnArray[6]);
 
-	// note: should test times for alignedBBCollision and halfCollisionCheck x 2
+	
 
 };
 

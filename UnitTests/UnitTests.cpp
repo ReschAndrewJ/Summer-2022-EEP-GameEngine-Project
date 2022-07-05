@@ -23,7 +23,13 @@
 #undef private
 #undef protected
 
-
+#define private public
+#define protected public
+#include "../Objects/Collision/Object_Collision.h"
+#include "../Objects/Collision/Object_Collision.cpp"
+#include "../Objects/Spatial/Object_Spatial.cpp"
+#undef private
+#undef protected
 
 #include <iomanip>
 #include <fstream>
@@ -739,6 +745,300 @@ namespace UnitTests
 		
 	};
 
+
+	TEST_CLASS(CollisionTests) {
+		Object_Collision* objectA; 
+		Object_Collision* objectB;
+		TEST_METHOD_INITIALIZE(MakeColliders) {
+			objectA = new Object_Collision();
+			objectB = new Object_Collision();
+
+			objectA->setAttribute(ATTRIBUTE_COLLIDER_WIDTH, 1);
+			objectA->setAttribute(ATTRIBUTE_COLLIDER_HEIGHT, 1);
+			objectA->setAttribute(ATTRIBUTE_COLLIDER_DEPTH, 1);
+			objectB->setAttribute(ATTRIBUTE_COLLIDER_WIDTH, 1);
+			objectB->setAttribute(ATTRIBUTE_COLLIDER_HEIGHT, 1);
+			objectB->setAttribute(ATTRIBUTE_COLLIDER_DEPTH, 1);
+		}
+
+		TEST_METHOD_CLEANUP(CleanupColliders) {
+			delete objectA;
+			delete objectB;
+		}
+
+		TEST_METHOD(ObjectABesideObjectB) {
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0);
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 0);
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0);
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 0);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0);
+			Assert::IsFalse(objectA->checkIsColliding(objectB));
+			
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0);
+			Assert::IsFalse(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 0);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 1);
+			Assert::IsFalse(objectA->checkIsColliding(objectB));
+		}
+
+		TEST_METHOD(ObjectBRotatedNearObjectACorner) {
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0);
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 0);
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0);
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_ROTATE_NOD, 45);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_ROTATE_TURN, 45);
+			Assert::IsFalse(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, -1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 1);
+			Assert::IsFalse(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, -1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 1);
+			Assert::IsFalse(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, -1);
+			Assert::IsFalse(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, -1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, -1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 1);
+			Assert::IsFalse(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, -1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, -1);
+			Assert::IsFalse(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, -1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, -1);
+			Assert::IsFalse(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, -1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, -1);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, -1);
+			Assert::IsFalse(objectA->checkIsColliding(objectB));
+		}
+
+		TEST_METHOD(NearPlanarObjectBRotatedNearObjectA) {
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0);
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 0);
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0);
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 0);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_Z, 0.1);
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0.6);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0.6);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_ROTATE_TURN, 45);
+			Assert::IsFalse(objectA->checkIsColliding(objectB)); 
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, -0.6);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0.6);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_ROTATE_TURN, -45);
+			Assert::IsFalse(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0.6);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, -0.6);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_ROTATE_TURN, -45);
+			Assert::IsFalse(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, -0.6);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, -0.6);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_ROTATE_TURN, 45);
+			Assert::IsFalse(objectA->checkIsColliding(objectB));
+			
+		}
+
+		TEST_METHOD(CornerlessCollision) {
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0);
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 0);
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0);
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 0);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_X, 2);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_Y, 0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_Z, 0.5);
+			Assert::IsTrue(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_X, 0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_Y, 2);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_Z, 0.5);
+			Assert::IsTrue(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_X, 0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_Y, 0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_Z, 2);
+			Assert::IsTrue(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_X, 2);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_Y, 2);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_Z, 0.5);
+			Assert::IsTrue(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_X, 2);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_Y, 0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_Z, 2);
+			Assert::IsTrue(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_X, 0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_Y, 2);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_Z, 2);
+			Assert::IsTrue(objectA->checkIsColliding(objectB));
+		}
+
+		TEST_METHOD(OneCornerCollision) {
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0);
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 0);
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0);
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0.5);
+			Assert::IsTrue(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, -0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0.5);
+			Assert::IsTrue(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, -0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0.5);
+			Assert::IsTrue(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, -0.5);
+			Assert::IsTrue(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, -0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, -0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0.5);
+			Assert::IsTrue(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, -0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, -0.5);
+			Assert::IsTrue(objectA->checkIsColliding(objectB));
+		
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, -0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, -0.5);
+			Assert::IsTrue(objectA->checkIsColliding(objectB));
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, -0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, -0.5);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, -0.5);
+			Assert::IsTrue(objectA->checkIsColliding(objectB));
+		}
+
+		TEST_METHOD(ObjectAInsideObjectB) {
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0);
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 0);
+			objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0);
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, 0);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, 0);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, 0);
+
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_X, 2);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_Y, 2);
+			objectB->setAttribute(ATTRIBUTE_SPATIAL_SCALE_Z, 2);
+			Assert::IsTrue(objectA->checkIsColliding(objectB));
+		}
+
+	};
+
+	TEST_CLASS(CollisionPerfomance) {
+		Object_Collision* objectA;
+		Object_Collision* objectB;
+		
+		TEST_METHOD_INITIALIZE(CreateColliders) {
+			objectA = new Object_Collision();
+			objectB = new Object_Collision();
+
+			objectA->setAttribute(ATTRIBUTE_COLLIDER_WIDTH, 1);
+			objectA->setAttribute(ATTRIBUTE_COLLIDER_HEIGHT, 1);
+			objectA->setAttribute(ATTRIBUTE_COLLIDER_DEPTH, 1);
+			objectB->setAttribute(ATTRIBUTE_COLLIDER_WIDTH, 1);
+			objectB->setAttribute(ATTRIBUTE_COLLIDER_HEIGHT, 1);
+			objectB->setAttribute(ATTRIBUTE_COLLIDER_DEPTH, 1);
+		}
+		TEST_METHOD_CLEANUP(CleanupColliders) {
+			delete objectA;
+			delete objectB;
+		}
+
+		TEST_METHOD(AlignedBBPerformance) {
+			const size_t cycles = 100;
+			double combined_time = 0;
+
+			for (size_t i = 0; i < cycles; ++i) {
+				objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, (rand() % 21 - 10) / 10);
+				objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, (rand() % 21 - 10) / 10);
+				objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, (rand() % 21 - 10) / 10);
+
+				objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, (rand() % 21 - 10) / 10);
+				objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, (rand() % 21 - 10) / 10);
+				objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, (rand() % 21 - 10) / 10);
+
+				auto start = std::chrono::steady_clock::now(); 
+
+				objectA->checkforAlignedBBColision(objectB);
+
+				auto end = std::chrono::steady_clock::now();
+				std::chrono::duration<double, std::milli> elapsed = end - start;
+				combined_time += elapsed.count();
+			}
+			double avg = combined_time / cycles;
+			Logger::WriteMessage(("Average Time: " + std::to_string(avg) + "ms").data());
+		}
+
+		TEST_METHOD(HalfCollisionTimesTwo) {
+			const size_t cycles = 100;
+			double combined_time = 0;
+
+			for (size_t i = 0; i < cycles; ++i) {
+				objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, (rand() % 21 - 10) / 10);
+				objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, (rand() % 21 - 10) / 10);
+				objectA->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, (rand() % 21 - 10) / 10);
+
+				objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_X, (rand() % 21 - 10) / 10);
+				objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Y, (rand() % 21 - 10) / 10);
+				objectB->setAttribute(ATTRIBUTE_SPATIAL_POSITION_Z, (rand() % 21 - 10) / 10);
+
+				auto start = std::chrono::steady_clock::now();
+
+				objectA->halfCollisionCheck(objectB);
+				objectB->halfCollisionCheck(objectA);
+
+				auto end = std::chrono::steady_clock::now();
+				std::chrono::duration<double, std::milli> elapsed = end - start;
+				combined_time += elapsed.count();
+			}
+			double avg = combined_time / cycles;
+			Logger::WriteMessage(("Average Time: " + std::to_string(avg) + "ms").data());
+		}
+
+	};
 
 
 }
