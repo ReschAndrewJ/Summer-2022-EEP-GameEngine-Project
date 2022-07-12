@@ -74,7 +74,7 @@ protected:
 
 public:
 	
-	Attribute getAttribute(std::string);
+	Attribute getAttribute(std::string) const;
 	void setAttribute(std::string, Attribute);
 	
 	// returns true is the object has the given class identifier
@@ -87,15 +87,15 @@ public:
 	std::string getParentIdentifier() const;
 
 	// returns the set of string identifiers of the object's child objects
-	std::unordered_set<std::string>& getChildrenIdentifiers();
+	const std::unordered_set<std::string>& getChildrenIdentifiers() const;
 
 	// returns a pointer to the requested object in the objects container
-	Object* getObject(std::string objectName);
+	Object* getObject(std::string objectName) const;
 
 	// adds an object to the object creation queue in the main engine
 	void queueCreateObject(std::string filepath, std::string objectName, std::string objectParent, std::vector<std::pair<std::string, Attribute>> modifiedAttributes = {});
 
-	// adds an object to the object destructino queue in the main engine
+	// adds an object to the object destruction queue in the main engine
 	void queueDestroyObject(std::string objectIdentifier);
 
 };

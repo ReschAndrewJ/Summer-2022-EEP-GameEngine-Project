@@ -55,12 +55,12 @@ std::string Object::getParentIdentifier() const {
 }
 
 
-std::unordered_set<std::string>& Object::getChildrenIdentifiers() {
+const std::unordered_set<std::string>& Object::getChildrenIdentifiers() const {
 	return children;
 }
 
 
-Object* Object::getObject(std::string identifier) {
+Object* Object::getObject(std::string identifier) const {
 	if (identifier.empty()) return nullptr;
 	return objectContainerPtr->at(identifier);
 }
@@ -76,7 +76,7 @@ void Object::queueDestroyObject(std::string objectIdentifier) {
 }
 
 
-Attribute Object::getAttribute(std::string attr) {
+Attribute Object::getAttribute(std::string attr) const {
 	return attributes.at(attr);
 }
 

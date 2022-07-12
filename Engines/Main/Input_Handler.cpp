@@ -1,5 +1,6 @@
 #include "Input_Handler.h"
 
+
 std::set<std::pair<int, int>> Input_Handler::current_pressed_keys {};
 uint16_t Input_Handler::connected_controllers_bitmask {};
 input_states::states Input_Handler::controller_button_states[16][GLFW_GAMEPAD_BUTTON_LAST] {};

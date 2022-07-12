@@ -54,9 +54,9 @@ private:
 	GLFWwindow* input_window = nullptr;
 
 	// holds the values of the key states
-	std::unordered_map<int, input_states::states> states_by_GLFWkey;
+	std::unordered_map<int, input_states::states> states_by_GLFWkey{};
 	// holds pointers to the values of the key states
-	std::unordered_map<std::string, input_states::states*> states_by_keyname;
+	std::unordered_map<std::string, input_states::states*> states_by_keyname{};
 	
 	input_states::states mouse_button_states[GLFW_MOUSE_BUTTON_LAST] {};
 	bool mouse_cursor_in_window = false;

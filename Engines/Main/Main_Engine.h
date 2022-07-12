@@ -52,22 +52,22 @@ private:
 	Input_Handler inputHandler;
 
 	
-	std::unordered_map <std::string, Object*> objectsContainer;
+	std::unordered_map <std::string, Object*> objectsContainer{};
 	// Object Queues
 	// 
 	// <filepath, objectName, parentIdentifier, modifiedAttributes>
-	std::vector<std::tuple<std::string, std::string, std::string, std::vector<std::pair<std::string, Attribute>>>> objectCreationQueue;
+	std::vector<std::tuple<std::string, std::string, std::string, std::vector<std::pair<std::string, Attribute>>>> objectCreationQueue{};
 	// <objectIdentifier>
-	std::unordered_set<std::string> objectDestructionQueue;
+	std::unordered_set<std::string> objectDestructionQueue{};
 	
 	// Graphics Queues
 	// 
 	// <{owner object identifier, image identifier attribute name}, imageCreateInfo>
-	std::map<std::pair<std::string, std::string>, image_create_info> imageCreationQueue;
+	std::map<std::pair<std::string, std::string>, image_create_info> imageCreationQueue{};
 	// <owner object identifier, image identifier attribute name>
-	std::set<std::pair<std::string, std::string>> imageDestructionQueue;
+	std::set<std::pair<std::string, std::string>> imageDestructionQueue{};
 	// <{owner object identifier, image identifier attribute name}, pushConstantsValues>
-	std::map<std::pair<std::string, std::string>, std::vector<unsigned char>> pushConstantsUpdateQueue;
+	std::map<std::pair<std::string, std::string>, std::vector<unsigned char>> pushConstantsUpdateQueue{};
 
 
 public:

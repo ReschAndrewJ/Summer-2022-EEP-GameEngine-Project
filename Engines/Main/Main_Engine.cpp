@@ -13,7 +13,7 @@ void Main_Engine::start(engine_start_info startInfo) {
 	}
 
 	inputHandler.initializeInput_Handler(displayWindow);
-	for (const auto& key : startInfo.keysToPoll) {
+	for (auto& key : startInfo.keysToPoll) {
 		inputHandler.setupKeyInput(key.first, key.second);
 	}
 
@@ -223,12 +223,13 @@ void Main_Engine::createObjectsInQueue() {
 		}
 		newIdentifiers.push_back(identifer);
 	}
+	objectCreationQueue.clear();
+
 	// run objects' afterCreation functions
 	for (auto& newObj : newIdentifiers) {
 		Object* objPtr = objectsContainer.at(newObj);
 		for (auto& func : objPtr->afterCreation_functions) func(objPtr);
 	}
-	objectCreationQueue.clear();
 }
 
 
@@ -254,6 +255,7 @@ void Main_Engine::destroyObjectsInQueue() {
 	for (auto& objToDestroy : queueAsVector) {
 		if (!objectsContainer.count(objToDestroy)) continue; // skip objects that already don't exist
 		delete objectsContainer.at(objToDestroy);
+		objectsContainer.erase(objToDestroy);
 	}
 	// clear queue
 	objectDestructionQueue.clear();
