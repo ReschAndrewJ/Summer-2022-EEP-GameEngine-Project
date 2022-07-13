@@ -736,6 +736,12 @@ void Graphics_Engine::shutdownEngine() {
 		boundMemory.erase(img.second.textureMemoryOffset);
 	}
 	images.clear();
+	for (auto& img : imagesToDestroy) {
+		vkDestroyImage(logicalDevice, img.second.first.textureImage, nullptr);
+		vkDestroyDescriptorPool(logicalDevice, img.second.first.descriptorPool, nullptr);
+		vkDestroyImageView(logicalDevice, img.second.first.textureImageView, nullptr);
+	}
+	imagesToDestroy.clear();
 
 	// free images memory
 	vkFreeMemory(logicalDevice, generalImageMemory, nullptr);
@@ -1060,7 +1066,33 @@ void Graphics_Engine::queueDestroyImage(std::string imageIdentifier) {
 	imageDestroyQueue.insert(imageIdentifier);
 }
 
+void Graphics_Engine::readyImageDestructionQueue() {
+	for (auto& imgIdentifier : imageDestroyQueue) {
+		if (!images.count(imgIdentifier)) continue;
+		Graphics_Image& image = images[imgIdentifier];
+		imagesToDestroy.insert({ imgIdentifier, {image, maxFramesInFlight} });
+		boundMemory.erase(image.textureMemoryOffset);
+		images.erase(imgIdentifier);
+	}
+	imageDestroyQueue.clear();
+}
+
 void Graphics_Engine::destroyQueuedImages() {
+	std::vector<std::string> destroyed;
+	for (auto& image : imagesToDestroy) {
+		image.second.second -= 1;
+		if (image.second.second <= 0) {
+			vkDestroyDescriptorPool(logicalDevice, image.second.first.descriptorPool, nullptr);
+			vkDestroyImageView(logicalDevice, image.second.first.textureImageView, nullptr);
+			vkDestroyImage(logicalDevice, image.second.first.textureImage, nullptr);
+			destroyed.push_back(image.first);
+		}
+	}
+	for (auto& img : destroyed) {
+		imagesToDestroy.erase(img);
+	}
+	
+	/* ORIGINAL FUNCTION, SPLIT UP INTO TWO FUNCTIONS TO AVOID DESTROYING BOUND DATA BY CREATING A ONE-FRAME DELAY
 	for (auto& imgIdentifier : imageDestroyQueue) {
 		if (!images.count(imgIdentifier)) continue;
 		Graphics_Image& image = images[imgIdentifier];
@@ -1071,6 +1103,7 @@ void Graphics_Engine::destroyQueuedImages() {
 		images.erase(imgIdentifier);
 	}
 	imageDestroyQueue.clear();
+	*/
 }
 
 void Graphics_Engine::createQueuedImages() {

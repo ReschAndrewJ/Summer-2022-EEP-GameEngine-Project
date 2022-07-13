@@ -23,9 +23,10 @@ void Main_Engine::start(engine_start_info startInfo) {
 	for (auto& func : startInfo.AddedObjectCreateFunctions) {
 		objectLoader.addClassCreatorFunction(func.first, func.second);
 	}
-	Object* rootObj = new Object();
-	rootObj->identifier = "ROOT";
-	objectsContainer["ROOT"] = rootObj;
+	
+	objectCreationQueue.push_back({ "", "ROOT", "", {} });
+	createObjectsInQueue();
+	
 	if (!startInfo.rootObject_filePath.empty() && !startInfo.rootObject_objectName.empty()) {
 		objectCreationQueue.push_back({ startInfo.rootObject_filePath, startInfo.rootObject_objectName, "ROOT", {} });
 	}
@@ -160,6 +161,8 @@ void Main_Engine::graphicsLoop(Main_Engine* self) {
 		self->graphicsEngine.updatePushConstants();
 		// destroy queued images
 		self->graphicsEngine.destroyQueuedImages();
+		// prepare image destruction for the next frame
+		self->graphicsEngine.readyImageDestructionQueue();
 
 		// mid-point block, let the main thread know the queues are safe to update
 		self->midFrameSemaphore.arriveAtSemaphore();
@@ -190,13 +193,23 @@ void Main_Engine::createObjectsInQueue() {
 	for (size_t i = 0; i < objectCreationQueue.size(); ++i) {
 		auto& queuedObj = objectCreationQueue[i];
 		
-		if (!objectsContainer.count(std::get<2>(queuedObj))) continue; // skip object if assigned parent doesn't exist
-		auto newObj = objectLoader.createInstance(std::get<0>(queuedObj), std::get<1>(queuedObj));
-		
-		std::string identifer = std::get<1>(queuedObj);
-		while (objectsContainer.count(identifer)) identifer += std::to_string(rand() % 10);
-		newObj.first->identifier = identifer;
-		newObj.first->parent = std::get<2>(queuedObj);
+		std::string identifier;
+		std::pair<Object*, std::vector<std::pair<std::string, std::string>>> newObj;
+		if (std::get<1>(queuedObj) == "ROOT") {
+			newObj.first = new Object();
+			newObj.first->identifier = "ROOT";
+			identifier = "ROOT";
+		}
+		else {
+			if (!objectsContainer.count(std::get<2>(queuedObj))) continue; // skip object if assigned parent doesn't exist
+			newObj = objectLoader.createInstance(std::get<0>(queuedObj), std::get<1>(queuedObj));
+
+			identifier = std::get<1>(queuedObj);
+			while (objectsContainer.count(identifier)) identifier += std::to_string(rand() % 10);
+			newObj.first->identifier = identifier;
+			newObj.first->parent = std::get<2>(queuedObj);
+		}
+
 		// handle requested pointers
 		for (auto& ptrIt : newObj.first->requestedPointers) {
 			void** pointer = reinterpret_cast<void**>(ptrIt.second);
@@ -216,12 +229,12 @@ void Main_Engine::createObjectsInQueue() {
 		for (auto& attr : std::get<3>(queuedObj)) {
 			newObj.first->setAttribute(attr.first, attr.second);
 		}
-		objectsContainer.insert({ identifer, newObj.first });
+		objectsContainer.insert({ identifier, newObj.first });
 		
 		for (size_t j = 0; j < newObj.second.size(); ++j) {
-			objectCreationQueue.push_back({ newObj.second[j].first, newObj.second[j].second, identifer, {} });
+			objectCreationQueue.push_back({ newObj.second[j].first, newObj.second[j].second, identifier, {} });
 		}
-		newIdentifiers.push_back(identifer);
+		newIdentifiers.push_back(identifier);
 	}
 	objectCreationQueue.clear();
 
@@ -229,6 +242,10 @@ void Main_Engine::createObjectsInQueue() {
 	for (auto& newObj : newIdentifiers) {
 		Object* objPtr = objectsContainer.at(newObj);
 		for (auto& func : objPtr->afterCreation_functions) func(objPtr);
+		// add objects to parents' children lists
+		if (objPtr->identifier != "ROOT") {
+			objectsContainer.at(objPtr->parent)->children.insert(objPtr->identifier);
+		}
 	}
 }
 
@@ -250,6 +267,10 @@ void Main_Engine::destroyObjectsInQueue() {
 		if (!objectsContainer.count(objToDestroy)) continue; // skip objects that already don't exist
 		Object* objPtr = objectsContainer.at(objToDestroy);
 		for (auto& func : objPtr->beforeDestruction_functions) func(objPtr);
+	}
+	// remove objects from parents' children lists
+	for (auto& objToDestroy : queueAsVector) {
+		objectsContainer.at(objectsContainer.at(objToDestroy)->parent)->children.erase(objToDestroy);
 	}
 	// destroy objects
 	for (auto& objToDestroy : queueAsVector) {
@@ -277,8 +298,7 @@ void Main_Engine::sendImageCreationQueue() {
 void Main_Engine::sendImageDestructionQueue() {
 
 	for (auto& img : imageDestructionQueue) {
-		if (!objectsContainer.count(img.first)) continue; // skip push update if the image owner object does not exist
-		graphicsEngine.queueDestroyImage(objectsContainer.at(img.first)->getAttribute(img.second));
+		graphicsEngine.queueDestroyImage(img);
 	}
 	imageDestructionQueue.clear();
 }
