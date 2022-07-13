@@ -87,7 +87,7 @@ void Object_Sprite::loadImage() {
 
 
 void Object_Sprite::unloadImage() {
-	(*imageDestructionQueuePtr).insert({ getIdentifier(), ATTRIBUTE_SPRITE_IMG_IDENTIFIER});
+	(*imageDestructionQueuePtr).insert((std::string)getAttribute(ATTRIBUTE_SPRITE_IMG_IDENTIFIER));
 }
 
 

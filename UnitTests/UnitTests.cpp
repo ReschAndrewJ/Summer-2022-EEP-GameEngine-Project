@@ -568,8 +568,8 @@ namespace UnitTests
 				" Integer intA 2556 " << std::endl <<
 				"Double  doubleA 3.14" << std::endl <<
 				"Boolean boolA true" << std::endl <<
+				"  String stringA str" << std::endl <<
 				" Character  charA f " << std::endl <<
-				"  String stringA \"str\"" << std::endl <<
 				std::endl;
 			testFile1.close();
 
@@ -717,7 +717,7 @@ namespace UnitTests
 		}
 
 		TEST_METHOD(TestPerformance) {
-			const size_t cycles = 100;
+			const size_t cycles = 500;
 			double combined_time = 0;
 			for (size_t i = 0; i < cycles; ++i) {
 				auto start = std::chrono::steady_clock::now();

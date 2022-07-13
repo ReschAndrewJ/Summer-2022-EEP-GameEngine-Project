@@ -71,7 +71,7 @@ std::pair<Object*, std::vector<std::pair<std::string, std::string>>> Object_Load
 		newObject->setAttribute(attr.first, attr.second);
 	}
 	returnData.first = newObject;
-	returnData.second = std::move(ObjectInfo.children);
+	returnData.second = ObjectInfo.children;
 
 	return returnData;
 }
@@ -381,9 +381,15 @@ void Object_Loader::loadDataFromInstFile(std::string filepath) {
 				}
 			}
 
+			bool quoteBounded = false;
 			for (size_t i = startPoint + 1; i < line.size(); ++i) {
 				if (line[i] == '"') {
 					startPoint = i+1;
+					quoteBounded = true;
+					break;
+				}
+				if (line[i] != ' ') {
+					startPoint = i;
 					break;
 				}
 			}
@@ -391,7 +397,8 @@ void Object_Loader::loadDataFromInstFile(std::string filepath) {
 			// attribute value
 			std::string sVal;
 			for (size_t i = startPoint; i < line.size(); ++i) {
-				if (line[i] == '"') break;
+				if (quoteBounded && line[i] == '"') break;
+				if (!quoteBounded && line[i] == ' ') break;
 				sVal.push_back(line[i]);
 			}
 

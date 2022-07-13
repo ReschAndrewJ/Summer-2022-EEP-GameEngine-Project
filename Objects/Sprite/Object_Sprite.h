@@ -31,8 +31,8 @@ class Object_Sprite : virtual public Object_Spatial {
 protected:
 	// <{owner object identifier, image identifier attribute name}, imageCreateInfo>
 	std::map<std::pair<std::string, std::string>, image_create_info>* imageCreationQueuePtr;
-	// <owner object identifier, image identifier attribute name>
-	std::set<std::pair<std::string, std::string>>* imageDestructionQueuePtr;
+	// <image identifier>
+	std::set<std::string>* imageDestructionQueuePtr;
 	// <{owner object identifier, image identifier attribute name}, pushConstantsValues>
 	std::map<std::pair<std::string, std::string>, std::vector<unsigned char>>* pushConstantsUpdateQueuePtr;
 

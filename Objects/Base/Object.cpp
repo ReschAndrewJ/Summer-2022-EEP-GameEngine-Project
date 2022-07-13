@@ -62,6 +62,7 @@ const std::unordered_set<std::string>& Object::getChildrenIdentifiers() const {
 
 Object* Object::getObject(std::string identifier) const {
 	if (identifier.empty()) return nullptr;
+	if (!objectContainerPtr->count(identifier)) return nullptr;
 	return objectContainerPtr->at(identifier);
 }
 
