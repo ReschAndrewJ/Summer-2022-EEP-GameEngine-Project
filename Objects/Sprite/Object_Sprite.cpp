@@ -8,8 +8,8 @@ Object_Sprite::Object_Sprite() {
 	addClassIdentifier(OBJECT_CLASS_SPRITE);
 
 	createAttribute(ATTRIBUTE_SPRITE_IMG_FILEPATH, Attribute::types::STRING);
-	createAttribute(ATTRIBUTE_SPRITE_WIDTH, Attribute::types::INTEGER);
-	createAttribute(ATTRIBUTE_SPRITE_HEIGHT, Attribute::types::INTEGER);
+	createAttribute(ATTRIBUTE_SPRITE_WIDTH, Attribute::types::DOUBLE);
+	createAttribute(ATTRIBUTE_SPRITE_HEIGHT, Attribute::types::DOUBLE);
 	createAttribute(ATTRIBUTE_SPRITE_VISIBLE, Attribute::types::BOOLEAN);
 	createAttribute(ATTRIBUTE_SPRITE_IMG_IDENTIFIER, Attribute::types::STRING);
 	

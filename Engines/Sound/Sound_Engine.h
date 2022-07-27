@@ -32,6 +32,7 @@ public:
 
 	// return false on failure
 	bool playAudio(std::string audioIdentifier);
+	bool isAudioPlaying(std::string audioIdentifier);
 
 	void stopAudio(std::string audioIdentifier);
 	void pauseAudio(std::string audioIdentifier);

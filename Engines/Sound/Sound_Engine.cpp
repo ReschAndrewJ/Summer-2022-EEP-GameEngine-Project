@@ -58,6 +58,7 @@ bool Sound_Engine::loadAudio(std::string filepath, std::string audioIdentifier, 
 
 void Sound_Engine::removeAudio(std::string audioIdentifier) {
 	if (audioContainer.count(audioIdentifier)) {
+		if (audioContainer.at(audioIdentifier)->isPlaying()) audioContainer.at(audioIdentifier)->stop();
 		delete audioContainer.at(audioIdentifier); 
 		audioContainer.erase(audioIdentifier);
 	}
@@ -77,6 +78,11 @@ bool Sound_Engine::playAudio(std::string audioIdentifier) {
 		return false;
 	}
 	return true;
+}
+
+bool Sound_Engine::isAudioPlaying(std::string audioIdentifier) {
+	if (!audioContainer.count(audioIdentifier)) return false;
+	return audioContainer.at(audioIdentifier)->isPlaying();
 }
 
 

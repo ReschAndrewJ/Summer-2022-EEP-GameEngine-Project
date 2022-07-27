@@ -10,12 +10,14 @@ Object_SoundOutput::Object_SoundOutput() {
 	createAttribute(ATTRIBUTE_SOUND_DOES_LOOP, Attribute::types::BOOLEAN);
 	createAttribute(ATTRIBUTE_SOUND_LOOP_START, Attribute::types::DOUBLE);
 	createAttribute(ATTRIBUTE_SOUND_LOOP_END, Attribute::types::DOUBLE);
+	createAttribute(ATTRIBUTE_SOUND_START_OFFSET, Attribute::types::DOUBLE);
 
 	setAttribute(ATTRIBUTE_SOUND_VOLUME, 50);
 
 	addRequestedPointer(PTR_IDENTIFIER::SOUND_ENGINE_PTR, &soundEnginePtr);
 
 	addAfterCreationFunction(&afterCreationFunc);
+	addBeforeDestructionFunction(&beforeDestructionFunc);
 	addProcessFunction(&processFunction, 20);
 }
 
@@ -39,6 +41,7 @@ void Object_SoundOutput::play() {
 		loadSound();
 		soundEnginePtr->playAudio(getIdentifier());
 	}
+	soundEnginePtr->setAudioOffset(getIdentifier(), (float)getAttribute(ATTRIBUTE_SOUND_START_OFFSET));
 }
 
 void Object_SoundOutput::pause() {
@@ -49,6 +52,9 @@ void Object_SoundOutput::stop() {
 	soundEnginePtr->stopAudio(getIdentifier());
 }
 
+float Object_SoundOutput::getOffset() {
+	return soundEnginePtr->getAudioOffset(getIdentifier());
+}
 
 void Object_SoundOutput::processFunction(Object* selfPtr, float delta) {
 	Object_SoundOutput& self = *dynamic_cast<Object_SoundOutput*>(selfPtr);

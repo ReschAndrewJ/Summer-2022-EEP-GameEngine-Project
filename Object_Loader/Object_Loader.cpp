@@ -11,6 +11,7 @@
 #include "../Objects/Text/Object_Text.h"
 #include "../Objects/ActiveCollision/Object_ActiveCollision.h"
 #include "../Objects/AnimatedSprite/Object_AnimatedSprite.h"
+#include "../Objects/SoundOutput/Object_SoundOutput.h"
 
 
 void Object_Loader::setupBuiltInClasses() {
@@ -22,7 +23,7 @@ void Object_Loader::setupBuiltInClasses() {
 	addClassCreatorFunction(OBJECT_CLASS_TEXT, [] {return (Object*) new Object_Text(); });
 	addClassCreatorFunction(OBJECT_CLASS_COLLISION, [] {return (Object*) new Object_Collision(); });
 	addClassCreatorFunction(OBJECT_CLASS_ACTIVECOLLISION, [] {return (Object*) new Object_ActiveCollision(); });
-
+	addClassCreatorFunction(OBJECT_CLASS_SOUNDOUTPUT, [] {return (Object*)new Object_SoundOutput(); });
 }
 #else
 #include "../Objects/Test/Object_Test1.h"

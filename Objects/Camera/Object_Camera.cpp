@@ -11,7 +11,12 @@ Object_Camera::Object_Camera() {
 	createAttribute(ATTRIBUTE_CAMERA_DEPTH_MAX, Attribute::types::DOUBLE);
 	createAttribute(ATTRIBUTE_CAMERA_FOV, Attribute::types::DOUBLE);
 
+	createAttribute(ATTRIBUTE_CAMERA_RATIO_WIDTH, Attribute::types::INTEGER);
+	createAttribute(ATTRIBUTE_CAMERA_RATIO_HEIGHT, Attribute::types::INTEGER);
+
 	setAttribute(ATTRIBUTE_CAMERA_FOV, 45);
+	setAttribute(ATTRIBUTE_CAMERA_RATIO_WIDTH, 1);
+	setAttribute(ATTRIBUTE_CAMERA_RATIO_HEIGHT, 1);
 
 	addRequestedPointer(PTR_IDENTIFIER::WINDOW_PTR, &windowPtr);
 
@@ -58,8 +63,9 @@ glm::mat4 Object_Camera::getCameraTransformationMatrix() {
 	glm::mat4 projectionMat = glm::mat4(1.0f);
 	
 	// perspective camera
-	int fWidth, fHeight;
-	glfwGetFramebufferSize(*windowPtr, &fWidth, &fHeight);
+	int fWidth = getAttribute(ATTRIBUTE_CAMERA_RATIO_WIDTH);
+	int fHeight = getAttribute(ATTRIBUTE_CAMERA_RATIO_HEIGHT);
+	if (!fWidth || !fHeight) glfwGetFramebufferSize(*windowPtr, &fWidth, &fHeight);
 	if (fWidth != 0 && fHeight != 0) {
 		projectionMat = glm::perspective(
 			glm::radians((float)getAttribute(ATTRIBUTE_CAMERA_FOV)), (float)fWidth / fHeight,

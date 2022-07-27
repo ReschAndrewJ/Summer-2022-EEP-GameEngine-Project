@@ -98,6 +98,9 @@ public:
 	// adds an object to the object destruction queue in the main engine
 	void queueDestroyObject(std::string objectIdentifier);
 
+	// changes objects' identifiers such that newParentIdentifier becomes the object's parent
+	void changeParentObject(std::string newParentIdentifier);
+
 };
 
 #endif //OBJECT_BASE

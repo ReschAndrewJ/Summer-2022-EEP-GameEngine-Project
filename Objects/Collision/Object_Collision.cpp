@@ -17,8 +17,6 @@ Object_Collision::Object_Collision() {
 
 	createAttribute(ATTRIBUTE_COLLIDER_MASK_OWN, Attribute::types::INTEGER);
 	createAttribute(ATTRIBUTE_COLLIDER_MASK_TARGET, Attribute::types::INTEGER);
-	setAttribute(ATTRIBUTE_COLLIDER_MASK_OWN, 1);
-	setAttribute(ATTRIBUTE_COLLIDER_MASK_TARGET, 1);
 	
 	addRequestedPointer(PTR_IDENTIFIER::OBJ_CONTAINER_PTR, &objectContainerPtr);
 }

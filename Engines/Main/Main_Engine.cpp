@@ -86,7 +86,7 @@ void Main_Engine::objectLoop() {
 	auto endOfLastFrame = std::chrono::steady_clock::now();
 
 	while (!glfwWindowShouldClose(displayWindow)) {
-		if (delta < shortestFrameLength) {
+		while (delta < shortestFrameLength) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(long long((shortestFrameLength - delta)*1000)));
 			auto time = std::chrono::steady_clock::now();
 			delta = std::chrono::duration<float>(time - endOfLastFrame).count();
@@ -151,10 +151,10 @@ void Main_Engine::objectLoop() {
 
 void Main_Engine::graphicsLoop(Main_Engine* self) {
 	while (!self->endLoop) {
-		if (self->delta < self->shortestFrameLength) {
+		while (self->delta < self->shortestFrameLength) {
 			std::this_thread::sleep_for(std::chrono::milliseconds(long long((self->shortestFrameLength - self->delta) * 1000)));
 		}
-
+		
 		// create queued images
 		self->graphicsEngine.createQueuedImages();
 		// update push constants
@@ -163,7 +163,7 @@ void Main_Engine::graphicsLoop(Main_Engine* self) {
 		self->graphicsEngine.destroyQueuedImages();
 		// prepare image destruction for the next frame
 		self->graphicsEngine.readyImageDestructionQueue();
-
+		
 		// mid-point block, let the main thread know the queues are safe to update
 		self->midFrameSemaphore.arriveAtSemaphore();
 
@@ -192,7 +192,7 @@ void Main_Engine::createObjectsInQueue() {
 	std::vector<std::string> newIdentifiers;
 	for (size_t i = 0; i < objectCreationQueue.size(); ++i) {
 		auto& queuedObj = objectCreationQueue[i];
-		
+
 		std::string identifier;
 		std::pair<Object*, std::vector<std::pair<std::string, std::string>>> newObj;
 		if (std::get<1>(queuedObj) == "ROOT") {
@@ -230,7 +230,7 @@ void Main_Engine::createObjectsInQueue() {
 			newObj.first->setAttribute(attr.first, attr.second);
 		}
 		objectsContainer.insert({ identifier, newObj.first });
-		
+
 		for (size_t j = 0; j < newObj.second.size(); ++j) {
 			objectCreationQueue.push_back({ newObj.second[j].first, newObj.second[j].second, identifier, {} });
 		}
@@ -238,15 +238,19 @@ void Main_Engine::createObjectsInQueue() {
 	}
 	objectCreationQueue.clear();
 
-	// run objects' afterCreation functions
+	// add objects to parents' children lists
 	for (auto& newObj : newIdentifiers) {
 		Object* objPtr = objectsContainer.at(newObj);
-		for (auto& func : objPtr->afterCreation_functions) func(objPtr);
-		// add objects to parents' children lists
 		if (objPtr->identifier != "ROOT") {
 			objectsContainer.at(objPtr->parent)->children.insert(objPtr->identifier);
 		}
 	}
+	// run objects' afterCreation functions
+	for (auto& newObj : newIdentifiers) {
+		Object* objPtr = objectsContainer.at(newObj);
+		for (auto& func : objPtr->afterCreation_functions) func(objPtr);
+	}
+
 }
 
 

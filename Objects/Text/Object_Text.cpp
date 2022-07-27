@@ -48,6 +48,7 @@ void Object_Text::loadImage() {
 		size_t baseline = 0;
 
 		for (size_t column = 0; column < charCols; ++column) {
+			if (row * charCols + column >= text.size()) break;
 			auto charImg = FontManager::getCharacterImage(font, text[row * charCols + column]);
 			
 			size_t charWidth = abs(charImg.second.first);
@@ -189,7 +190,7 @@ void Object_Text::loadImage() {
 	imgInfo.fragShaderPath = "Resources/Shaders/textFrag.spv";
 	imgInfo.identifier = getIdentifier();
 	imgInfo.graphicsPipeline = "Text_Pipeline";
-
+	
 	imgInfo.texture_columns = (uint32_t)(maxWidth / 4);
 	imgInfo.texture_rows = (uint32_t)(pixels.size() / maxWidth);
 
@@ -224,9 +225,12 @@ void Object_Text::loadImage() {
 		initPushConstants.boundYOuter = 0;
 	}
 	else {
-		size_t boundCol = (count - 1);
+		size_t boundCol = count - 1;
+		if (boundCol >= xBounds.size()) boundCol = xBounds.size() - 1;
 		initPushConstants.boundX = xBounds[boundCol];
-		size_t boundRow = (count-1) / charCols;
+		size_t boundRow = (count - 1) / charCols;
+		if (boundRow >= yBounds.size())boundRow = yBounds.size() - 1;
+			
 		initPushConstants.boundYInner = yBounds[boundRow].first;
 		initPushConstants.boundYOuter = initPushConstants.boundYInner + yBounds[boundRow].second;
 	}
@@ -283,9 +287,12 @@ void Object_Text::updatePushConstants() {
 			cols = ((std::string)getAttribute(ATTRIBUTE_TEXT_STRING)).size();
 			rows = 1;
 		}
-		size_t boundCol = (count - 1);
+		size_t boundCol = count - 1;
+		if (boundCol >= xBounds.size()) boundCol = xBounds.size() - 1;
 		pushValues.boundX = xBounds[boundCol];
-		size_t boundRow = (count-1) / cols;
+		size_t boundRow = (count - 1) / cols;
+		if (boundRow >= yBounds.size()) boundRow = yBounds.size() - 1;
+		
 		pushValues.boundYInner = yBounds[boundRow].first;
 		pushValues.boundYOuter = pushValues.boundYInner + yBounds[boundRow].second;
 	}

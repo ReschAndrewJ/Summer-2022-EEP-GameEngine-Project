@@ -1113,6 +1113,15 @@ void Graphics_Engine::createQueuedImages() {
 	VkDeviceSize stagingBufferSize = 0;
 	std::unordered_map<std::string/*image*/, VkDeviceSize/*offset*/> stagingBufferOffsets;
 
+	// get staging buffer requirements
+	createVulkanBuffer(4096, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+		VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixelStagingBuffer, stagingBufferMemory);
+	VkMemoryRequirements stagingMemReqs{};
+	vkGetBufferMemoryRequirements(logicalDevice, pixelStagingBuffer, &stagingMemReqs);
+	VkDeviceSize stagingAlignment = stagingMemReqs.alignment;
+	vkDestroyBuffer(logicalDevice, pixelStagingBuffer, nullptr);
+	vkFreeMemory(logicalDevice, stagingBufferMemory, nullptr);
+
 	for (auto& queuedImg : imageCreateQueue) {
 		// create Graphics_Image instance
 		auto& image = images.insert({ queuedImg.first, Graphics_Image() }).first->second;
@@ -1134,7 +1143,9 @@ void Graphics_Engine::createQueuedImages() {
 			VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, image.textureImage);
 
 		// bind image memory
-		VkDeviceSize imgSize = (VkDeviceSize)queuedImg.second.texture_columns * queuedImg.second.texture_rows * 4;
+		VkMemoryRequirements imgReqs{};
+		vkGetImageMemoryRequirements(logicalDevice, image.textureImage, &imgReqs);
+		VkDeviceSize imgSize = imgReqs.size;
 		bindImageMemoryAllocation(image, imgSize);
 
 		// create texture imageView
@@ -1145,23 +1156,31 @@ void Graphics_Engine::createQueuedImages() {
 
 		// increase size of staging buffer before buffer creation
 		stagingBufferSize += imgSize;
+
+		// adjust for alignment
+		if (stagingBufferSize % stagingAlignment > 0) stagingBufferSize += (stagingAlignment - stagingBufferSize % stagingAlignment);
 	}
 	
 	// create staging buffer
 	createVulkanBuffer(stagingBufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
 		VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pixelStagingBuffer, stagingBufferMemory);
-
 	
 	VkDeviceSize offset = 0;
 	// copy pixel data to staging buffer
 	for (auto& queuedImg : imageCreateQueue) {
-		VkDeviceSize imgSize = (VkDeviceSize)queuedImg.second.texture_columns * queuedImg.second.texture_rows * 4;
+		VkDeviceSize imgDataSize = (VkDeviceSize)queuedImg.second.texture_columns * queuedImg.second.texture_rows * 4;
 		void* data;
-		vkMapMemory(logicalDevice, stagingBufferMemory, offset, imgSize, 0, &data);
-		memcpy(data, queuedImg.second.pixels.data(), imgSize);
+		vkMapMemory(logicalDevice, stagingBufferMemory, offset, imgDataSize, 0, &data);
+		memcpy(data, queuedImg.second.pixels.data(), imgDataSize);
 		vkUnmapMemory(logicalDevice, stagingBufferMemory);
 		stagingBufferOffsets[queuedImg.first] = offset;
-		offset += imgSize;
+
+		VkMemoryRequirements stagingMemReqs{};
+		vkGetBufferMemoryRequirements(logicalDevice, pixelStagingBuffer, &stagingMemReqs);
+		VkDeviceSize stagingAlignment = stagingMemReqs.alignment;
+		
+		offset += imgDataSize;
+		if (offset % stagingAlignment > 0) offset += (stagingAlignment - offset % stagingAlignment);
 	}
 
 	// transition image layouts
@@ -1272,20 +1291,23 @@ void Graphics_Engine::bindImageMemoryAllocation(Graphics_Image& image, VkDeviceS
 			VkDeviceSize test_pos = it->first + it->second; // offset + size
 			// apply image alignment correction
 			if (test_pos % imageMemoryAlignment > 0) test_pos += (imageMemoryAlignment - test_pos % imageMemoryAlignment);
+			
 			// check if fits
 			if ((std::next(it) != boundMemory.end() && std::next(it)->first >= test_pos + imageSize)
 				|| (std::next(it) == boundMemory.end() && test_pos + imageSize <= imageMemoryAllocationBytes)) {
 				VkResult res = vkBindImageMemory(logicalDevice, image.textureImage, generalImageMemory, test_pos);
 				if (res != VK_SUCCESS) {
 					std::string err = "failed to bind image memory, VK_Result: " + std::to_string((int)res);
-					printf(err.c_str());
 					return;
 				}
+				
 				boundMemory[test_pos] = imageSize;
 				image.textureMemoryOffset = test_pos;
 				return;
 			}
 		}
+		
+
 	}
 	// not enough allocated memory remaining
 	std::string err = "out of memory to allocate image\n";

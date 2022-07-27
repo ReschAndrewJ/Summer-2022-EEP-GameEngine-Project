@@ -106,7 +106,10 @@ std::pair<std::vector<unsigned char>, std::pair<int,int>> FontManager::getCharac
 	return { pixels, {pitch, charTop} };
 	*/
 	
-	int pitch = (font->glyph->bitmap.pitch >= 0 ? font->glyph->advance.x / 64 : -font->glyph->advance.x / 64);
+	int pitch = (abs(font->glyph->bitmap.pitch) > font->glyph->advance.x / 64) ? 
+		font->glyph->bitmap.pitch : (font->glyph->bitmap.pitch >= 0 ? 
+			font->glyph->advance.x / 64 : -font->glyph->advance.x / 64);
+
 	pitch = format_color ? pitch : pitch * 4;
 	std::vector<unsigned char> pixels(font->glyph->bitmap.rows * abs(pitch));
 

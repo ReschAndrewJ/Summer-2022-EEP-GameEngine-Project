@@ -19,6 +19,7 @@ const auto ATTRIBUTE_SOUND_LOOP_START = "SoundStart";
 // loop end time in seconds
 const auto ATTRIBUTE_SOUND_LOOP_END = "SoundEnd";
 
+const auto ATTRIBUTE_SOUND_START_OFFSET = "SoundStartOffset";
 
 class Object_SoundOutput : virtual public Object {
 private:
@@ -31,6 +32,7 @@ public:
 	void play();
 	void pause();
 	void stop();
+	float getOffset();
 
 	static void afterCreationFunc(Object* selfPtr);
 	static void beforeDestructionFunc(Object* selfPtr);

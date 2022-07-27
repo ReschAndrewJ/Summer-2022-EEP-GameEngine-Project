@@ -17,6 +17,8 @@ Double SpatialTilt 0
 
 Double CameraFOV 90
 
+Integer CameraAspectRatioWidth 16
+Integer CameraAspectRatioHeight 9
 
 Child Here testSprite1
 Child Here testSprite2
@@ -27,12 +29,15 @@ Child Here testAnimatedSprite
 Child Here testPlayer
 Child Here react
 
+#Child Here testText2
+#Child Here testText3
+
 
 Object testSprite1 Object_Sprite
 
 Double SpatialPosX 0
 Double SpatialPosY 0 
-Double SpatialPosZ -1
+Double SpatialPosZ -8
 
 Integer SpriteWidth 32
 Integer SpriteHeight 32
@@ -101,7 +106,76 @@ Integer TextCount -1
 Integer SpriteWidth 48
 Integer SpriteHeight 48
 
+####
+Object testText2 Object_Text
 
+String SpriteFilepath "C:/Windows/Fonts/comicbd.ttf"
+
+String TextString "A"
+
+Integer TextCount -1
+Double SpatialPosY 100
+Integer SpriteWidth 48
+Integer SpriteHeight 48
+
+Object testText3 Object_Text
+
+String SpriteFilepath "C:/Windows/Fonts/comicbd.ttf"
+
+String TextString "B"
+
+Integer TextCount -1
+Double SpatialPosY -100
+Integer SpriteWidth 48
+Integer SpriteHeight 48
+
+Object testText4 Object_Text
+
+String SpriteFilepath "C:/Windows/Fonts/comicbd.ttf"
+
+String TextString "C"
+
+Integer TextCount -1
+Double SpatialPosX 100
+Integer SpriteWidth 48
+Integer SpriteHeight 48
+
+Object testText5 Object_Text
+
+String SpriteFilepath "C:/Windows/Fonts/comicbd.ttf"
+
+String TextString "D"
+
+Integer TextCount -1
+Double SpatialPosY -100
+Double SpatialPosX 100
+Integer SpriteWidth 48
+Integer SpriteHeight 48
+
+Object testText6 Object_Text
+
+String SpriteFilepath "C:/Windows/Fonts/comicbd.ttf"
+
+String TextString "E"
+
+Integer TextCount -1
+Double SpatialPosY -200
+Integer SpriteWidth 48
+Integer SpriteHeight 48
+
+Object testText7 Object_Text
+
+String SpriteFilepath "C:/Windows/Fonts/comicbd.ttf"
+
+String TextString "F"
+
+Integer TextCount -1
+Double SpatialPosY -300
+Integer SpriteWidth 48
+Integer SpriteHeight 48
+
+
+###
 Object testAnimatedSprite Object_AnimatedSprite
 
 String SpriteFilepath "./test_runFullEngine/test_spritesheet1.png"
@@ -149,6 +223,8 @@ Double ColliderWidth 16
 Double ColliderHeight 16
 Double ColliderDepth 0.1
 
+Integer ColliderMaskTarget 1
+
 Child Here showPlayerCollisionArea
 
 
@@ -173,6 +249,7 @@ Double SpatialPosZ 30
 Double SpatialNod 45
 Double SpatialTurn -45
 
+Integer ColliderMask 1
 
 Object showPlayerCollisionArea Object_Sprite
 
@@ -189,3 +266,4 @@ Double SpatialScaleY 1
 Boolean SpriteIsVisible true
 
 String SpriteFilepath "./test_runFullEngine/test_img1.png"
+

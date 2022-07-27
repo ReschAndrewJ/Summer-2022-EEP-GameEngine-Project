@@ -12,6 +12,9 @@ const auto ATTRIBUTE_CAMERA_DEPTH_MIN = "MinCameraDepth";
 const auto ATTRIBUTE_CAMERA_DEPTH_MAX = "MaxCameraDepth";
 const auto ATTRIBUTE_CAMERA_FOV = "CameraFOV";
 
+const auto ATTRIBUTE_CAMERA_RATIO_WIDTH = "CameraAspectRatioWidth";
+const auto ATTRIBUTE_CAMERA_RATIO_HEIGHT = "CameraAspectRatioHeight";
+
 class Object_Camera : virtual public Object_Spatial {
 protected:
 	GLFWwindow** windowPtr;

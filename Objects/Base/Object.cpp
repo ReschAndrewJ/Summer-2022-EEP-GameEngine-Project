@@ -92,3 +92,16 @@ bool Object::is_class(std::string identifier) const {
 }
 
 
+void Object::changeParentObject(std::string newParentIdentifier) {
+	std::string oldParentId = parent;
+	Object* oldParentPtr = getObject(parent);
+	Object* newParentPtr = getObject(newParentIdentifier);
+	if (newParentPtr == nullptr) {
+		printf("tried to change parent object for object: %s, but new parent: %s does not exist\n",
+			identifier.c_str(), newParentIdentifier.c_str());
+		return;
+	}
+	if (oldParentPtr != nullptr) oldParentPtr->children.erase(identifier);
+	newParentPtr->children.insert(identifier);
+	parent = newParentIdentifier;
+}

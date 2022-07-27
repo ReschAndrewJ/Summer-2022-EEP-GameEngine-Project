@@ -25,8 +25,8 @@ class Graphics_Engine
 		VK_KHR_SWAPCHAIN_EXTENSION_NAME 
 	};
 	
-	VkDeviceSize imageMemoryAllocationBytes = 1 << 20; 
-	// 1<<20 = 1MB
+	VkDeviceSize imageMemoryAllocationBytes = 1 << 25; 
+	// 1<<25 = 33MB
 
 public:
 	bool framebufferResized = false;
